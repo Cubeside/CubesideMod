@@ -5,6 +5,8 @@ import de.fanta.cubeside.CubesideClientFabric;
 import de.fanta.cubeside.config.Configs;
 import de.fanta.cubeside.util.ColorUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
+import java.awt.Color;
+import java.util.List;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.state.EntityHitbox;
 import net.minecraft.client.render.entity.state.EntityHitboxAndView;
@@ -15,13 +17,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.awt.*;
-import java.util.List;
-
 @Mixin(EntityRenderer.class)
 public abstract class MixinCustomHitBox<T extends Entity> {
 
-    @Shadow protected abstract void appendHitboxes(T entity, ImmutableList.Builder<EntityHitbox> builder, float tickProgress);
+    @Shadow
+    protected abstract void appendHitboxes(T entity, ImmutableList.Builder<EntityHitbox> builder, float tickProgress);
 
     /**
      * @author fantahund
@@ -57,8 +57,8 @@ public abstract class MixinCustomHitBox<T extends Entity> {
         if (entity2 != null) {
             float f = Math.min(entity2.getWidth(), entity.getWidth()) / 2.0F;
             float g = 0.0625F;
-            Vec3d vec3d = entity2.getPassengerRidingPos(entity).subtract(entity.getPos());
-            EntityHitbox entityHitbox2 = new EntityHitbox(vec3d.x - (double) f, vec3d.y, vec3d.z - (double) f, vec3d.x + (double) f, vec3d.y + (double) 0.0625F, vec3d.z + (double) f, 1.0F, 1.0F, 0.0F);
+            Vec3d vec3d = entity2.getPassengerRidingPos(entity).subtract(entity.getEntityPos());
+            EntityHitbox entityHitbox2 = new EntityHitbox(vec3d.x - f, vec3d.y, vec3d.z - f, vec3d.x + f, vec3d.y + 0.0625F, vec3d.z + f, 1.0F, 1.0F, 0.0F);
             builder.add(entityHitbox2);
         }
 

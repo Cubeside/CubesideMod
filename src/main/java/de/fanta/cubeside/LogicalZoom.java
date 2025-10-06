@@ -7,7 +7,7 @@ import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
 public class LogicalZoom {
-    //Code from LogicalGeekBoy -> https://github.com/LogicalGeekBoy/logical_zoom
+    // Code from LogicalGeekBoy -> https://github.com/LogicalGeekBoy/logical_zoom
     private static boolean currentlyZoomed;
     private static KeyBinding keyBinding;
     private static boolean originalSmoothCameraEnabled;
@@ -16,7 +16,7 @@ public class LogicalZoom {
     public static final float zoomLevel = 0.23F;
 
     public void initLogicalZoom() {
-        keyBinding = new KeyBinding("key.logical_zoom.zoom", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.cubeside");
+        keyBinding = new KeyBinding("key.logical_zoom.zoom", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, KeyBinds.CATEGORY_CUBESIDE);
 
         currentlyZoomed = false;
         originalSmoothCameraEnabled = false;

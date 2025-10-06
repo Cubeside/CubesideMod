@@ -37,8 +37,8 @@ public class AFKCheckCommand extends SubCommand {
                 List<PlayerListEntry> list = ENTRY_ORDERING.sortedCopy(clientPlayNetworkHandler.getListedPlayerListEntries());
                 for (PlayerListEntry playerListEntry : list) {
                     if (playerListEntry != null) {
-                        String playername = playerListEntry.getProfile().getName();
-                        if (!Objects.equals(playername, MinecraftClient.getInstance().getGameProfile().getName()) && !Configs.PermissionSettings.AdminList.getStrings().contains(playername)) {
+                        String playername = playerListEntry.getProfile().name();
+                        if (!Objects.equals(playername, MinecraftClient.getInstance().getGameProfile().name()) && !Configs.PermissionSettings.AdminList.getStrings().contains(playername)) {
                             playerList.add(playername);
                         }
                     }
@@ -105,6 +105,6 @@ public class AFKCheckCommand extends SubCommand {
         Team team = playerListEntry.getScoreboardTeam();
         Team team2 = playerListEntry2.getScoreboardTeam();
         return ComparisonChain.start().compareTrueFirst(playerListEntry.getGameMode() != GameMode.SPECTATOR, playerListEntry2.getGameMode() != GameMode.SPECTATOR).compare(team != null ? team.getName() : "", team2 != null ? team2.getName() : "")
-                .compare(playerListEntry.getProfile().getName(), playerListEntry2.getProfile().getName(), String::compareToIgnoreCase).result();
+                .compare(playerListEntry.getProfile().name(), playerListEntry2.getProfile().name(), String::compareToIgnoreCase).result();
     });
 }

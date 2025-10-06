@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'fabric-loom' version '1.11-SNAPSHOT'
     id 'maven-publish'
     id "com.modrinth.minotaur" version "2.4.3"
 }
@@ -43,7 +43,7 @@ dependencies {
 
     modApi("com.terraformersmc:modmenu:${project.modmenu_version}")
 
-    modImplementation include("fi.dy.masa.malilib:malilib-fabric-1.21.8:${project.malilib_version}")
+    modImplementation include("fi.dy.masa.malilib:malilib-fabric-1.21.10-rc1:${project.malilib_version}")
     modImplementation "de.cubeside.cubesideutils.fabric:CubesideUtilsFabricClient:${project.cubeside_utils_version}"
 
     modImplementation "maven.modrinth:sodium:${project.sodium_version}"
@@ -76,8 +76,11 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
+base {
+    archivesName = project.archives_base_name
+}
+
 java {
-    archivesBaseName = project.archives_base_name
     withSourcesJar()
 
     sourceCompatibility = JavaVersion.VERSION_21
@@ -86,7 +89,7 @@ java {
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { "${it}_${project.archives_base_name}" }
     }
 }
 
@@ -94,7 +97,7 @@ tasks.publish.dependsOn build
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId archivesBaseName
+            artifactId project.archives_base_name
 
             // add all the jars that should be included when publishing to maven
             //artifact(jar)             { builtBy remapJar }

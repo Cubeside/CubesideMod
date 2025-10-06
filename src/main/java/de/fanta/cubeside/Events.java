@@ -13,7 +13,6 @@ import java.util.Optional;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.AbstractSignBlock;
 import net.minecraft.block.BlockState;
@@ -101,7 +100,7 @@ public class Events {
                 }
 
                 if (Configs.HitBox.KeepEntityHitBox.getBooleanValue()) {
-                    client.getEntityRenderDispatcher().setRenderHitboxes(Configs.HitBox.ShowHitBox.getBooleanValue());
+                    // FIXME 1.21.9 client.getEntityRenderDispatcher().setRenderHitboxes(Configs.HitBox.ShowHitBox.getBooleanValue());
                 }
             }
         });
@@ -222,7 +221,7 @@ public class Events {
             CubesideClientFabric.commands.register(dispatcher);
         });
 
-        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(context -> MiningAssistent.render(context.matrixStack()));
+        // FIXME 1.21.9 WorldRenderEvents.BEFORE_DEBUG_RENDER.register(context -> MiningAssistent.render(context.matrixStack()));
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             ItemStack itemInHand = player.getStackInHand(hand);
