@@ -2,12 +2,14 @@ package de.fanta.cubeside.mixin;
 
 import com.mojang.serialization.Codec;
 import de.fanta.cubeside.util.BoostedSliderCallbacks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.client.option.SimpleOption.Callbacks;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextContent;
-import net.minecraft.text.TranslatableTextContent;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.client.OptionInstance.ValueSet;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentContents;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -17,24 +19,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-@Mixin(SimpleOption.class)
+@Mixin(OptionInstance.class)
 public class MixinGammaSimpleOption {
     @Shadow
     @Final
-    Text text;
+    Component caption;
 
     @Shadow
     @Final
     @Mutable
-    Function<Double, Text> textGetter;
+    Function<Double, Component> toString;
 
     @Shadow
     @Final
     @Mutable
-    Callbacks<Double> callbacks;
+    ValueSet<Double> values;
 
     @Shadow
     @Final
@@ -44,35 +43,35 @@ public class MixinGammaSimpleOption {
     @Shadow
     @Final
     @Mutable
-    Consumer<Double> changeCallback;
+    Consumer<Double> onValueUpdate;
 
-    @Inject(at = @At("RETURN"), method = "<init>(Ljava/lang/String;Lnet/minecraft/client/option/SimpleOption$TooltipFactory;Lnet/minecraft/client/option/SimpleOption$ValueTextGetter;Lnet/minecraft/client/option/SimpleOption$Callbacks;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V")
+    @Inject(at = @At("RETURN"), method = "<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V")
     private void init(CallbackInfo info) {
-        TextContent content = this.text.getContent();
-        if (!(content instanceof TranslatableTextContent translatableTextContent))
+        ComponentContents content = this.caption.getContents();
+        if (!(content instanceof TranslatableContents translatableTextContent)) {
             return;
+        }
 
         String key = translatableTextContent.getKey();
-        if (!key.equals("options.gamma"))
+        if (!key.equals("options.gamma")) {
             return;
+        }
 
-        this.textGetter = this::textGetter;
-        this.callbacks = BoostedSliderCallbacks.INSTANCE;
-        this.codec = this.callbacks.codec();
-        this.changeCallback = this::changeCallback;
+        this.toString = this::textGetter;
+        this.values = BoostedSliderCallbacks.INSTANCE;
+        this.codec = this.values.codec();
+        this.onValueUpdate = this::changeCallback;
     }
 
     @Unique
-    private Text textGetter(Double gamma) {
+    private Component textGetter(Double gamma) {
         long brightness = Math.round(gamma * 100);
-        return Text.translatable("options.gamma").append(": ").append(
-                brightness == 0 ? Text.translatable("options.gamma.min") :
-                brightness == 100 ? Text.translatable("options.gamma.max") :
-                Text.literal(String.valueOf(brightness)));
+        return Component.translatable("options.gamma").append(": ").append(
+                brightness == 0 ? Component.translatable("options.gamma.min") : brightness == 100 ? Component.translatable("options.gamma.max") : Component.literal(String.valueOf(brightness)));
     }
 
     @Unique
     private void changeCallback(Double gamma) {
-        MinecraftClient.getInstance().options.getGamma().setValue(gamma);
+        Minecraft.getInstance().options.gamma().set(gamma);
     }
 }

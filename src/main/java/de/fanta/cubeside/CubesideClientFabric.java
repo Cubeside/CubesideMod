@@ -14,7 +14,7 @@ import java.util.List;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +34,7 @@ public class CubesideClientFabric implements ClientModInitializer {
 
     private static boolean loadingMessages;
     public static boolean databaseinuse = false;
-    public static List<Text> messageQueue = new ArrayList<>();
+    public static List<Component> messageQueue = new ArrayList<>();
 
     private static long time;
 

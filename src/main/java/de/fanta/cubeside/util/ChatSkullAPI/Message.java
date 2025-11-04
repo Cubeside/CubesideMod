@@ -3,7 +3,7 @@ package de.fanta.cubeside.util.ChatSkullAPI;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class Message {
 
@@ -63,7 +63,7 @@ public class Message {
         String[] arrayOfString;
         for (i = (arrayOfString = this.lines).length, b = 0; b < i;) {
             String line = arrayOfString[b];
-            MinecraftClient.getInstance().player.networkHandler.sendChatCommand("additemlore " + line);
+            Minecraft.getInstance().player.connection.sendCommand("additemlore " + line);
             b++;
         }
     }

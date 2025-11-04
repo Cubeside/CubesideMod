@@ -1,19 +1,19 @@
 package de.fanta.cubeside.util;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 
 public class SoundThread extends Thread {
 
     private final long millis;
     private final SoundEvent sound;
-    private final PlayerEntity player;
+    private final Player player;
     private boolean running;
     private final boolean soundPlaying;
     private boolean force;
 
-    public SoundThread(long millis, SoundEvent sound, PlayerEntity player) {
+    public SoundThread(long millis, SoundEvent sound, Player player) {
         super();
         this.millis = millis;
         this.sound = sound;
@@ -21,7 +21,7 @@ public class SoundThread extends Thread {
         this.soundPlaying = true;
     }
 
-    public static synchronized SoundThread of(long millis, SoundEvent sound, PlayerEntity player){
+    public static synchronized SoundThread of(long millis, SoundEvent sound, Player player){
         return new SoundThread(millis, sound, player);
     }
 
@@ -29,7 +29,7 @@ public class SoundThread extends Thread {
     public void run() {
         while (running) {
             if (soundPlaying) {
-                player.playSoundToPlayer(sound, SoundCategory.PLAYERS, 100.0f, 1.0f);
+                player.playNotifySound(sound, SoundSource.PLAYERS, 100.0f, 1.0f);
                 force = false;
             }
             try {

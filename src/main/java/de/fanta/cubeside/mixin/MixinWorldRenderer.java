@@ -6,15 +6,15 @@ import de.fanta.cubeside.util.ColorUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
 import java.awt.Color;
 import java.util.List;
-import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Mixin(WorldRenderer.class)
+@Mixin(LevelRenderer.class)
 public abstract class MixinWorldRenderer {
 
-    @ModifyConstant(method = "renderTargetBlockOutline(Lnet/minecraft/client/render/VertexConsumerProvider$Immediate;Lnet/minecraft/client/util/math/MatrixStack;ZLnet/minecraft/client/render/state/WorldRenderState;)V", constant = @Constant(intValue = -16777216), expect = 1)
+    @ModifyConstant(method = "renderBlockOutline(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;ZLnet/minecraft/client/renderer/state/LevelRenderState;)V", constant = @Constant(intValue = -16777216), expect = 1)
     private int replaceColor(int original) {
         Color color;
         if (Configs.HitBox.RainbowBlockHitBox.getBooleanValue()) {

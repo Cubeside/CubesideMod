@@ -1,9 +1,9 @@
 package de.fanta.cubeside.mixin;
 
-import net.minecraft.client.render.entity.EntityRenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(EntityRenderManager.class)
+@Mixin(EntityRenderDispatcher.class)
 public class MixinEntityRenderDispatcher {
     // FIXME 1.21.9
     // @Inject(at = @At("RETURN"), method = "setRenderHitboxes")

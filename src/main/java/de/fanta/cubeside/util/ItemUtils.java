@@ -1,24 +1,23 @@
 package de.fanta.cubeside.util;
 
 import de.iani.cubesideutils.Pair;
-import net.minecraft.component.type.LoreComponent;
-import net.minecraft.text.Text;
-
 import java.util.List;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.component.ItemLore;
 
 public class ItemUtils {
-    public static Pair<Integer, Integer> getDamageValuesFormCustomItem(LoreComponent loreComponent) {
+    public static Pair<Integer, Integer> getDamageValuesFormCustomItem(ItemLore loreComponent) {
         int durablility = -1;
         int maxDurablility = -1;
-        List<Text> lines = loreComponent.lines();
+        List<Component> lines = loreComponent.lines();
         if (!lines.isEmpty()) {
-            Text mutableText = lines.getLast();
+            Component mutableText = lines.getLast();
             if (mutableText != null) {
                 String fullDurabilityString = mutableText.getString();
                 if (fullDurabilityString.startsWith("Haltbarkeit:") || fullDurabilityString.startsWith("Durability")) {
                     String[] splitFull = fullDurabilityString.split(" ", 2);
                     if (splitFull.length == 2) {
-                        String durabilityString = Text.literal(splitFull[1]).getString();
+                        String durabilityString = Component.literal(splitFull[1]).getString();
                         String[] splitDurability = durabilityString.split("/", 2);
                         if (splitDurability.length == 2) {
                             try {

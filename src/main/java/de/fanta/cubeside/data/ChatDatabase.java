@@ -19,16 +19,16 @@ import java.io.IOException;
 import java.io.UTFDataFormatException;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.StrictJsonParser;
 import org.apache.logging.log4j.Level;
 
 public class ChatDatabase {
     private final String server;
-    private final DynamicRegistryManager registry;
+    private final RegistryAccess registry;
 
     private File dbFile;
     private ArrayList<ChatMessage> chatMessages;
@@ -37,7 +37,7 @@ public class ChatDatabase {
 
     private DataOutputStream dataOut;
 
-    public ChatDatabase(String server, DynamicRegistryManager registry) {
+    public ChatDatabase(String server, RegistryAccess registry) {
         long time = System.nanoTime();
         this.server = server;
         this.registry = registry;
@@ -167,21 +167,21 @@ public class ChatDatabase {
         }
     }
 
-    public List<Text> loadMessages() {
+    public List<Component> loadMessages() {
         return loadMessages(-1);
     }
 
-    public List<Text> loadMessages(int limit) {
+    public List<Component> loadMessages(int limit) {
         long time = System.nanoTime();
-        List<Text> entries = new ArrayList<>();
+        List<Component> entries = new ArrayList<>();
         int size = chatMessages.size();
         int num = 0;
-        RegistryOps<JsonElement> ops = registry.getOps(JsonOps.INSTANCE);
+        RegistryOps<JsonElement> ops = registry.createSerializationContext(JsonOps.INSTANCE);
         for (ChatMessage entry : chatMessages) {
             if (limit == -1 || num >= size - limit) {
                 try {
                     JsonElement jsonElement = StrictJsonParser.parse(entry.text());
-                    DataResult<Pair<Text, JsonElement>> result = TextCodecs.CODEC.decode(ops, jsonElement);
+                    DataResult<Pair<Component, JsonElement>> result = ComponentSerialization.CODEC.decode(ops, jsonElement);
                     if (result.isSuccess()) {
                         entries.add(result.getOrThrow().getFirst());
                     }

@@ -1,10 +1,8 @@
 package de.fanta.cubeside.util;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
-
 import java.awt.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 
 public class FlashColorScreen {
     private static boolean isRunning = false;
@@ -20,11 +18,11 @@ public class FlashColorScreen {
         }
     }
 
-    public static void onClientTick(DrawContext drawContext) {
+    public static void onClientTick(GuiGraphics drawContext) {
         if (isRunning && counter < duration) {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            int width = mc.getWindow().getScaledWidth();
-            int height = mc.getWindow().getScaledHeight();
+            Minecraft mc = Minecraft.getInstance();
+            int width = mc.getWindow().getGuiScaledWidth();
+            int height = mc.getWindow().getGuiScaledHeight();
             Color newColor;
             if (counter < duration / 2) {
                 newColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (100 * (counter / (duration / 2f))));

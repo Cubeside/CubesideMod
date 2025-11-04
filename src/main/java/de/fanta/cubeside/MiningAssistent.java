@@ -1,17 +1,17 @@
 package de.fanta.cubeside;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import de.fanta.cubeside.config.Configs;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.World;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Quaternionf;
 
 public class MiningAssistent {
@@ -60,7 +60,7 @@ public class MiningAssistent {
         }
     }
 
-    public static void render(MatrixStack stack) {
+    public static void render(PoseStack stack) {
         if (startPos == null) {
             startPos = new BlockPos(Configs.MiningAssistent.MiningAssistentStartX.getIntegerValue(), Configs.MiningAssistent.MiningAssistentStartY.getIntegerValue(), Configs.MiningAssistent.MiningAssistentStartZ.getIntegerValue());
         }
@@ -70,7 +70,7 @@ public class MiningAssistent {
         }
     }
 
-    public static void spawnParticleSpiral(MatrixStack stack, int distance, int circles) {
+    public static void spawnParticleSpiral(PoseStack stack, int distance, int circles) {
         Point current = new Point(startPos.getX(), startPos.getZ());
         double radius = 0;
 
@@ -99,7 +99,7 @@ public class MiningAssistent {
     private static BlockPos getNextY(BlockPos pos) {
         for (int y = pos.getY(); y <= pos.getY() + 5; y++) {
             BlockPos currentLocation = new BlockPos(pos.getX(), y, pos.getZ());
-            BlockState state = MinecraftClient.getInstance().world.getBlockState(currentLocation);
+            BlockState state = Minecraft.getInstance().level.getBlockState(currentLocation);
             if (state != null && state.isAir()) {
                 return new BlockPos(pos.getX(), y, pos.getZ());
             }
@@ -121,26 +121,26 @@ public class MiningAssistent {
         Configs.saveToFile();
     }
 
-    public static void renderTextOnBlock(MatrixStack matrixStack, BlockPos pos, MiningDirection direction, String string, int color) {
+    public static void renderTextOnBlock(PoseStack matrixStack, BlockPos pos, MiningDirection direction, String string, int color) {
         BlockPos down = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
-        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-        VertexConsumerProvider.Immediate source = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
-        World world = MinecraftClient.getInstance().world;
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
+        Level world = Minecraft.getInstance().level;
         String text = String.valueOf(string);
-        TextRenderer font = MinecraftClient.getInstance().textRenderer;
-        double cameraX = camera.getPos().x;
-        double cameraY = camera.getPos().y;
-        VoxelShape upperOutlineShape = world.getBlockState(down).getOutlineShape(world, down, ShapeContext.of(MinecraftClient.getInstance().player));
+        Font font = Minecraft.getInstance().font;
+        double cameraX = camera.getPosition().x;
+        double cameraY = camera.getPosition().y;
+        VoxelShape upperOutlineShape = world.getBlockState(down).getShape(world, down, CollisionContext.of(Minecraft.getInstance().player));
         if (!upperOutlineShape.isEmpty())
-            cameraY += 1 - upperOutlineShape.getMax(Direction.Axis.Y);
-        double cameraZ = camera.getPos().z;
-        matrixStack.push();
+            cameraY += 1 - upperOutlineShape.max(Direction.Axis.Y);
+        double cameraZ = camera.getPosition().z;
+        matrixStack.pushPose();
         matrixStack.translate(pos.getX() + 0.5 - cameraX, pos.getY() - cameraY + 0.005, pos.getZ() + 0.5 - cameraZ);
-        matrixStack.multiply(new Quaternionf().fromAxisAngleDeg(1, 0, 0, 90)); //90
+        matrixStack.mulPose(new Quaternionf().fromAxisAngleDeg(1, 0, 0, 90)); //90
         float size = 0.07F;
         matrixStack.scale(-size, -size, size);
-        float float_3 = (float) (-font.getWidth(text)) / 2.0F + 0.4f;
-        font.draw(text, float_3, -3.5f, color, false, matrixStack.peek().getPositionMatrix(), source, TextRenderer.TextLayerType.NORMAL, 0, 15728880);
-        matrixStack.pop();
+        float float_3 = (float) (-font.width(text)) / 2.0F + 0.4f;
+        font.drawInBatch(text, float_3, -3.5f, color, false, matrixStack.last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
+        matrixStack.popPose();
     }
 }

@@ -1,22 +1,22 @@
 package de.fanta.cubeside;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 
 public class LogicalZoom {
     // Code from LogicalGeekBoy -> https://github.com/LogicalGeekBoy/logical_zoom
     private static boolean currentlyZoomed;
-    private static KeyBinding keyBinding;
+    private static KeyMapping keyBinding;
     private static boolean originalSmoothCameraEnabled;
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static final Minecraft mc = Minecraft.getInstance();
 
     public static final float zoomLevel = 0.23F;
 
     public void initLogicalZoom() {
-        keyBinding = new KeyBinding("key.logical_zoom.zoom", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, KeyBinds.CATEGORY_CUBESIDE);
+        keyBinding = new KeyMapping("key.logical_zoom.zoom", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, KeyBinds.CATEGORY_CUBESIDE);
 
         currentlyZoomed = false;
         originalSmoothCameraEnabled = false;
@@ -25,7 +25,7 @@ public class LogicalZoom {
     }
 
     public static boolean isZooming() {
-        return keyBinding.isPressed();
+        return keyBinding.isDown();
     }
 
     public static void manageSmoothCamera() {
@@ -41,15 +41,15 @@ public class LogicalZoom {
     }
 
     private static boolean isSmoothCamera() {
-        return mc.options.smoothCameraEnabled;
+        return mc.options.smoothCamera;
     }
 
     private static void enableSmoothCamera() {
-        mc.options.smoothCameraEnabled = true;
+        mc.options.smoothCamera = true;
     }
 
     private static void disableSmoothCamera() {
-        mc.options.smoothCameraEnabled = false;
+        mc.options.smoothCamera = false;
     }
 
     private static boolean zoomStarting() {

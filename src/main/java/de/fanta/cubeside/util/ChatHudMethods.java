@@ -1,10 +1,10 @@
 package de.fanta.cubeside.util;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public interface ChatHudMethods {
 
-    void cubesideMod$addStoredChatMessage(Text message);
+    void cubesideMod$addStoredChatMessage(Component message);
 
     void cubesideMod$addStoredCommand(String command);
 }

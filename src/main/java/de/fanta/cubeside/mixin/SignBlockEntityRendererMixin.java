@@ -1,9 +1,9 @@
 package de.fanta.cubeside.mixin;
 
-import net.minecraft.client.render.block.entity.AbstractSignBlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.AbstractSignRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 
-@Mixin(AbstractSignBlockEntityRenderer.class)
+@Mixin(AbstractSignRenderer.class)
 class SignBlockEntityRendererMixin {
     // FIXME 1.21.9
     // @Shadow

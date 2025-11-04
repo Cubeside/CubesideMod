@@ -1,30 +1,28 @@
 package de.fanta.cubeside.util;
 
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
 import de.fanta.cubeside.CubesideClientFabric;
 import java.util.Optional;
+import net.minecraft.client.OptionInstance.SliderableValueSet;
 
-import com.mojang.serialization.Codec;
-
-import net.minecraft.client.option.SimpleOption.SliderCallbacks;
-import com.mojang.datafixers.util.Either;
-
-public enum BoostedSliderCallbacks implements SliderCallbacks<Double> {
+public enum BoostedSliderCallbacks implements SliderableValueSet<Double> {
     INSTANCE;
 
     @Override
-    public Optional<Double> validate(Double double_) {
+    public Optional<Double> validateValue(Double double_) {
         return double_ >= CubesideClientFabric.minGamma && double_ <= CubesideClientFabric.maxGamma ? Optional.of(double_) : Optional.empty();
     }
 
     @Override
-    public double toSliderProgress(Double double_) {
+    public double toSliderValue(Double double_) {
         double range = CubesideClientFabric.maxGamma - CubesideClientFabric.minGamma;
         double offset = CubesideClientFabric.minGamma;
         return (double_ - offset) / range;
     }
 
     @Override
-    public Double toValue(double d) {
+    public Double fromSliderValue(double d) {
         double range = CubesideClientFabric.maxGamma - CubesideClientFabric.minGamma;
         double offset = CubesideClientFabric.minGamma;
         return d * range + offset;

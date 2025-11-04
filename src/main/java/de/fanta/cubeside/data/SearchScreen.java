@@ -5,33 +5,33 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.screen.ScreenTexts;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import org.lwjgl.glfw.GLFW;
 
 public class SearchScreen extends Screen {
     private final Screen parent;
-    private TextFieldWidget searchField;
-    private final List<Text> allEntries;
-    private final List<Text> filteredEntries;
+    private EditBox searchField;
+    private final List<Component> allEntries;
+    private final List<Component> filteredEntries;
     private int scrollOffset = 0;
     private static final int ENTRIES_PER_PAGE = 15;
     private static final int ENTRY_HEIGHT = 20;
     private static final int PADDING = 5;
     private static final int TEXT_MARGIN = 10;
-    private static final Collection<ButtonWidget> buttonCache = new ArrayList<>();
+    private static final Collection<Button> buttonCache = new ArrayList<>();
 
-    public SearchScreen(Screen parent, DynamicRegistryManager manager) {
-        super(Text.literal("Chat Log (" + CubesideClientFabric.getChatDatabase().getServer() + ")"));
+    public SearchScreen(Screen parent, RegistryAccess manager) {
+        super(Component.literal("Chat Log (" + CubesideClientFabric.getChatDatabase().getServer() + ")"));
         this.parent = parent;
         allEntries = CubesideClientFabric.getChatDatabase().loadMessages();
         filteredEntries = new ArrayList<>(allEntries);
@@ -39,30 +39,30 @@ public class SearchScreen extends Screen {
 
     @Override
     protected void init() {
-        searchField = new TextFieldWidget(textRenderer, 10, 35, 300, 20, Text.literal("Suche..."));
-        this.searchField.setFocusUnlocked(false);
-        this.searchField.setEditableColor(-1);
-        this.searchField.setUneditableColor(-1);
+        searchField = new EditBox(font, 10, 35, 300, 20, Component.literal("Suche..."));
+        this.searchField.setCanLoseFocus(false);
+        this.searchField.setTextColor(-1);
+        this.searchField.setTextColorUneditable(-1);
         this.searchField.setMaxLength(100);
-        this.searchField.setText("");
-        addDrawableChild(searchField);
+        this.searchField.setValue("");
+        addRenderableWidget(searchField);
 
-        addDrawableChild(ButtonWidget.builder(Text.literal("Suchen"), button -> {
-            String keyword = searchField.getText();
+        addRenderableWidget(Button.builder(Component.literal("Suchen"), button -> {
+            String keyword = searchField.getValue();
             filterEntries(keyword);
-        }).dimensions(320, 35, 100, 20).build());
+        }).bounds(320, 35, 100, 20).build());
 
-        addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> this.client.setScreen(this.parent)).dimensions(width / 2 - 50, this.height - 28, 150, 20).build());
+        addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) -> this.minecraft.setScreen(this.parent)).bounds(width / 2 - 50, this.height - 28, 150, 20).build());
 
-        this.addDrawableChild(new TextWidget(0, 10, this.width, 9, this.title, this.textRenderer));
+        this.addRenderableWidget(new StringWidget(0, 10, this.width, 9, this.title, this.font));
         resetScrollOffset();
     }
 
     private void filterEntries(String keyword) {
         this.searchField.setFocused(false);
-        this.searchField.setFocusUnlocked(false);
+        this.searchField.setCanLoseFocus(false);
         this.filteredEntries.clear();
-        for (Text entry : this.allEntries) {
+        for (Component entry : this.allEntries) {
             if (entry.getString().toLowerCase().contains(keyword.toLowerCase())) {
                 this.filteredEntries.add(entry);
             }
@@ -72,11 +72,11 @@ public class SearchScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         // FIXME 1.21.6 this.applyBlur();
-        this.renderDarkening(context);
+        this.renderMenuBackground(context);
 
-        buttonCache.forEach(this::remove);
+        buttonCache.forEach(this::removeWidget);
         buttonCache.clear();
 
         int startY = 60;
@@ -91,24 +91,24 @@ public class SearchScreen extends Screen {
             int entryBackgroundColor = (i % 2 == 0) ? new Color(128, 128, 128, 100).getRGB() : new Color(166, 166, 166, 100).getRGB();
             context.fill(TEXT_MARGIN, y, this.width - TEXT_MARGIN - 65, y + ENTRY_HEIGHT, entryBackgroundColor);
 
-            Text entry = filteredEntries.get(i);
-            List<OrderedText> lines = textRenderer.wrapLines(entry, availableWidth);
+            Component entry = filteredEntries.get(i);
+            List<FormattedCharSequence> lines = font.split(entry, availableWidth);
 
             int textY = y + 5;
-            for (OrderedText line : lines) {
-                context.drawText(textRenderer, line, TEXT_MARGIN + 5, textY, Color.white.getRGB(), true);
-                textY += this.textRenderer.fontHeight;
+            for (FormattedCharSequence line : lines) {
+                context.drawString(font, line, TEXT_MARGIN + 5, textY, Color.white.getRGB(), true);
+                textY += this.font.lineHeight;
             }
 
-            ButtonWidget buttonWidget = ButtonWidget.builder(Text.literal("Copy"), button -> MinecraftClient.getInstance().keyboard.setClipboard(entry.getString())).dimensions(this.width - 70, y, 60, 20).build();
-            addDrawableChild(buttonWidget);
+            Button buttonWidget = Button.builder(Component.literal("Copy"), button -> Minecraft.getInstance().keyboardHandler.setClipboard(entry.getString())).bounds(this.width - 70, y, 60, 20).build();
+            addRenderableWidget(buttonWidget);
             buttonCache.add(buttonWidget);
         }
         super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float delta) {
         // NOTHING :>
     }
 
@@ -141,10 +141,10 @@ public class SearchScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyInput input) {
-        int keyCode = input.getKeycode();
+    public boolean keyPressed(KeyEvent input) {
+        int keyCode = input.input();
         if ((keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) && this.searchField.isFocused()) {
-            filterEntries(this.searchField.getText());
+            filterEntries(this.searchField.getValue());
         }
         return super.keyPressed(input);
     }
