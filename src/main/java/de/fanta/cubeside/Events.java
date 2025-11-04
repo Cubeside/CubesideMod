@@ -98,10 +98,6 @@ public class Events {
                     }
 
                 }
-
-                if (Configs.HitBox.KeepEntityHitBox.getBooleanValue()) {
-                    // FIXME 1.21.9 client.getEntityRenderDispatcher().setRenderHitboxes(Configs.HitBox.ShowHitBox.getBooleanValue());
-                }
             }
         });
 

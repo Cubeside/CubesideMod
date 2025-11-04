@@ -110,7 +110,6 @@ public class Configs implements IConfigHandler {
     }
 
     public static class HitBox {
-        public static final ConfigBoolean KeepEntityHitBox = new ConfigBoolean("KeepEntityHitBox", false, Component.translatable("options.cubeside.keepentityhitbox").getString());
         public static final ConfigBoolean RainbowEntityHitBox = new ConfigBoolean("RainbowEntityHitBox", false, Component.translatable("options.cubeside.rainbowentityhitbox").getString());
         public static final ConfigColorList RainbowEntityHitBoxColorList = new ConfigColorList("RainbowEntityHitBoxColorList", ImmutableList.of(Color4f.fromColor(16711684), Color4f.fromColor(16754176), Color4f.fromColor(16769280), Color4f.fromColor(65305), Color4f.fromColor(35071), Color4f.fromColor(13959423)), Component.translatable("options.cubeside.rainbowentityhitboxcolorlist").getString());
         public static final ConfigDouble RainbowEntityHitBoxSpeed = new ConfigDouble("RainbowEntityHitBoxSpeed", 0.1, 0.0, 1.0, true, Component.translatable("options.cubeside.rainbowentityhitboxspeed").getString());
@@ -123,7 +122,6 @@ public class Configs implements IConfigHandler {
         public static final ConfigDouble BlockHitBoxVisibility = new ConfigDouble("BlockHitBoxVisibility", 0.4, 0.0, 1, true, Component.translatable("options.cubeside.blockhitboxvisibility").getString());
         public static final ConfigColor BlockHitBoxColor = new ConfigColor("BlockHitBoxColor", "#000000", Component.translatable("options.cubeside.blockhitboxcolor").getString());
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                KeepEntityHitBox,
                 RainbowEntityHitBox,
                 RainbowEntityHitBoxColorList,
                 RainbowEntityHitBoxSpeed,

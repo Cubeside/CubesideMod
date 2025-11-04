@@ -18,8 +18,6 @@
     "options.cubeside.kickbynotvalidmessage": "Kick beim überprüfen von Nachrichten",
     "options.cubeside.showadditionalrepaircosts": "Zusätzliche Reparaturkosten bei Items anzeigen",
 
-
-    "options.cubeside.keepentityhitbox": "Behält den Entitäten Hitbox Status nach einem Neustart",
     "options.cubeside.rainbowentityhitbox": "Regenbogen Entitäten Hitbox",
     "options.cubeside.rainbowentityhitboxcolorlist": "Regenbogen Entitäten Hitbox Farben",
     "options.cubeside.entityhitboxvisibility": "Entitäten Hitbox Sichtbarkeit",
