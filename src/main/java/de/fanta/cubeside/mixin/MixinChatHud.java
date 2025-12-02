@@ -25,12 +25,13 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -196,7 +197,8 @@ public abstract class MixinChatHud implements ChatHudMethods {
 
                     if (Configs.Generic.TpaSound.getBooleanValue()) {
                         if (minecraft.player != null) {
-                            minecraft.player.playNotifySound(SoundEvent.createVariableRangeEvent(ResourceLocation.parse("block.note_block.flute")), SoundSource.PLAYERS, 20.0f, 0.5f);
+                            Vec3 pos = minecraft.player.position();
+                            minecraft.level.playLocalSound(pos.x, pos.y, pos.z, SoundEvent.createVariableRangeEvent(Identifier.parse("block.note_block.flute")), SoundSource.PLAYERS, 20.0f, 0.5f, false);
                         }
                     }
 
@@ -213,7 +215,8 @@ public abstract class MixinChatHud implements ChatHudMethods {
 
                     if (Configs.Generic.TpaSound.getBooleanValue()) {
                         if (minecraft.player != null) {
-                            minecraft.player.playNotifySound(SoundEvent.createVariableRangeEvent(ResourceLocation.parse("block.note_block.flute")), SoundSource.PLAYERS, 20.0f, 0.5f);
+                            Vec3 pos = minecraft.player.position();
+                            minecraft.level.playLocalSound(pos.x, pos.y, pos.z, SoundEvent.createVariableRangeEvent(Identifier.parse("block.note_block.flute")), SoundSource.PLAYERS, 20.0f, 0.5f, false);
                         }
                     }
 
@@ -382,8 +385,9 @@ public abstract class MixinChatHud implements ChatHudMethods {
     @Unique
     public void playAFKSound() {
         if (minecraft.player != null) {
-            SoundEvent sound = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(CubesideClientFabric.MODID, "afk"));
-            minecraft.player.playNotifySound(sound, SoundSource.PLAYERS, 0.2f, 1.0f);
+            SoundEvent sound = SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(CubesideClientFabric.MODID, "afk"));
+            Vec3 pos = minecraft.player.position();
+            minecraft.level.playLocalSound(pos.x, pos.y, pos.z, sound, SoundSource.PLAYERS, 0.2f, 1.0f, false);
         }
     }
 

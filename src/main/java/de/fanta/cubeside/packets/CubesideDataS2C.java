@@ -14,12 +14,12 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StrictJsonParser;
 
 public class CubesideDataS2C implements CustomPacketPayload {
-    public static final Type<CubesideDataS2C> PACKET_ID = new Type<>(ResourceLocation.fromNamespaceAndPath("cubesidemod", "data"));
+    public static final Type<CubesideDataS2C> PACKET_ID = new Type<>(Identifier.fromNamespaceAndPath("cubesidemod", "data"));
     public static final StreamCodec<FriendlyByteBuf, CubesideDataS2C> PACKET_CODEC = StreamCodec.ofMember(CubesideDataS2C::write, CubesideDataS2C::new);
 
     private ChatInfo chatInfo;

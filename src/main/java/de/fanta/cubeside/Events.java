@@ -24,7 +24,7 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.AxeItem;
@@ -133,7 +133,7 @@ public class Events {
 
                 if (Configs.Generic.ElytraAlarm.getBooleanValue()) {
                     if (sound == null) {
-                        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(CubesideClientFabric.MODID, "alarm");
+                        Identifier location = Identifier.fromNamespaceAndPath(CubesideClientFabric.MODID, "alarm");
                         sound = SoundEvent.createVariableRangeEvent(location);
                     }
                     if (mc.player.isFallFlying() && mc.player.getY() <= mc.level.getMinY()) {
@@ -268,7 +268,7 @@ public class Events {
                     CubesideClientFabric.LOGGER.info("Server is a Realm.");
                     RealmsClient realmsClient = RealmsClient.getOrCreate(Minecraft.getInstance());
                     RealmsServerList realmsServerList = realmsClient.listRealms();
-                    for (RealmsServer realmsServer : realmsServerList.servers) {
+                    for (RealmsServer realmsServer : realmsServerList.servers()) {
                         if (realmsServer.name.equals(serverInfo.name)) {
                             serverName = "Realm_" + realmsServer.id + "." + realmsServer.ownerUUID;
                             break;

@@ -3,6 +3,7 @@ package de.fanta.cubeside.util;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 public class SoundThread extends Thread {
 
@@ -21,7 +22,7 @@ public class SoundThread extends Thread {
         this.soundPlaying = true;
     }
 
-    public static synchronized SoundThread of(long millis, SoundEvent sound, Player player){
+    public static synchronized SoundThread of(long millis, SoundEvent sound, Player player) {
         return new SoundThread(millis, sound, player);
     }
 
@@ -29,11 +30,14 @@ public class SoundThread extends Thread {
     public void run() {
         while (running) {
             if (soundPlaying) {
-                player.playNotifySound(sound, SoundSource.PLAYERS, 100.0f, 1.0f);
+                Vec3 pos = player.position();
+                player.level().playLocalSound(pos.x, pos.y, pos.z, sound, SoundSource.PLAYERS, 100.0f, 1.0f, false);
                 force = false;
             }
             try {
-                if (!running) break;
+                if (!running) {
+                    break;
+                }
                 if (!force) {
                     Thread.sleep(millis);
                 }

@@ -3,7 +3,7 @@ package de.fanta.cubeside;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyBinds {
@@ -19,7 +19,7 @@ public class KeyBinds {
     public static KeyMapping EDIT_SIGN;
 
     public void initKeys() {
-        CATEGORY_CUBESIDE = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath("cubeside", "cubeside"));
+        CATEGORY_CUBESIDE = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("cubeside", "cubeside"));
 
         NARRATOR_KEYBINDING = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "options.narrator",

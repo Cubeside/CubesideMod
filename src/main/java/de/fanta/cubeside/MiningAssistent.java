@@ -20,9 +20,11 @@ public class MiningAssistent {
 
     public static int count = 0;
 
-
     public enum MiningDirection {
-        NORTH(0, 1), EAST(1, 0), SOUTH(0, -1), WEST(-1, 0);
+        NORTH(0, 1),
+        EAST(1, 0),
+        SOUTH(0, -1),
+        WEST(-1, 0);
 
         public final int xDiff;
         public final int zDiff;
@@ -87,7 +89,7 @@ public class MiningAssistent {
                             renderTextOnBlock(stack, loc, dir, dir.getCornerArrow(), 16407647);
                         }
                     } else {
-                        renderTextOnBlock(stack, loc, dir, dir.getArrow(), 4587379); //↑
+                        renderTextOnBlock(stack, loc, dir, dir.getArrow(), 4587379); // ↑
                     }
                 }
                 dir = dir.next();
@@ -128,18 +130,19 @@ public class MiningAssistent {
         Level world = Minecraft.getInstance().level;
         String text = String.valueOf(string);
         Font font = Minecraft.getInstance().font;
-        double cameraX = camera.getPosition().x;
-        double cameraY = camera.getPosition().y;
+        double cameraX = camera.position().x;
+        double cameraY = camera.position().y;
         VoxelShape upperOutlineShape = world.getBlockState(down).getShape(world, down, CollisionContext.of(Minecraft.getInstance().player));
-        if (!upperOutlineShape.isEmpty())
+        if (!upperOutlineShape.isEmpty()) {
             cameraY += 1 - upperOutlineShape.max(Direction.Axis.Y);
-        double cameraZ = camera.getPosition().z;
+        }
+        double cameraZ = camera.position().z;
         matrixStack.pushPose();
         matrixStack.translate(pos.getX() + 0.5 - cameraX, pos.getY() - cameraY + 0.005, pos.getZ() + 0.5 - cameraZ);
-        matrixStack.mulPose(new Quaternionf().fromAxisAngleDeg(1, 0, 0, 90)); //90
+        matrixStack.mulPose(new Quaternionf().fromAxisAngleDeg(1, 0, 0, 90)); // 90
         float size = 0.07F;
         matrixStack.scale(-size, -size, size);
-        float float_3 = (float) (-font.width(text)) / 2.0F + 0.4f;
+        float float_3 = (-font.width(text)) / 2.0F + 0.4f;
         font.drawInBatch(text, float_3, -3.5f, color, false, matrixStack.last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
         matrixStack.popPose();
     }
