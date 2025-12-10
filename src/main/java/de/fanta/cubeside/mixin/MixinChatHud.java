@@ -15,6 +15,7 @@ import java.util.List;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ComponentRenderUtils;
@@ -97,7 +98,7 @@ public abstract class MixinChatHud implements ChatHudMethods {
     public abstract void addMessageToDisplayQueue(GuiMessage message);
 
     @Inject(method = "render", at = @At(value = "RETURN"))
-    private void renderChatHudInfo(GuiGraphics context, int currentTick, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
+    private void renderChatHudInfo(GuiGraphics context, Font font, int currentTick, int mouseX, int mouseY, boolean focused, boolean changeCursorOnInsertions, CallbackInfo ci) {
         if (focused) {
             chatInfoHud = chatInfoHud != null ? chatInfoHud : new ChatInfoHud();
             chatInfoHud.onRenderChatInfoHud(context);

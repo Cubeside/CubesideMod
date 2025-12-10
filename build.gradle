@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.13-SNAPSHOT'
+    id 'fabric-loom' version '1.14-SNAPSHOT'
     id 'maven-publish'
     id "com.modrinth.minotaur" version "2.4.3"
 }
@@ -43,7 +43,7 @@ dependencies {
 
     modApi("com.terraformersmc:modmenu:${project.modmenu_version}")
 
-    modImplementation include("fi.dy.masa.malilib:malilib-fabric-1.21.11-pre3:${project.malilib_version}")
+    modImplementation include("fi.dy.masa.malilib:malilib-fabric-1.21.11:${project.malilib_version}")
     modImplementation "de.cubeside.cubesideutils.fabric:CubesideUtilsFabricClient:${project.cubeside_utils_version}"
 
     modImplementation "maven.modrinth:sodium:${project.sodium_version}"
