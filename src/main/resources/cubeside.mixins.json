@@ -18,10 +18,9 @@
     "MixinGammaSimpleOption",
     "MixinItemStack",
     "MixinKeyboard",
-    "MixinOptionImpl",
     "MixinRemoveChristmasChest",
     "MixinRenderEntity",
-    "MixinSliderControl",
+    "MixinSodiumConfigBuilder",
     "MixinWorldRenderer",
     "SignBlockEntityRendererMixin"
   ],
