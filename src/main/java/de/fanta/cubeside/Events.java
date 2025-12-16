@@ -16,6 +16,7 @@ import java.util.Optional;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
@@ -175,6 +176,7 @@ public class Events {
 
                 while (KeyBinds.SET_MINING_ASSISTANT_START_POINT.consumeClick()) {
                     MiningAssistent.setStartPos(Minecraft.getInstance().player.blockPosition());
+                    mc.player.displayClientMessage(Component.nullToEmpty("MiningAssistent start position set"), true);
                 }
 
                 while (KeyBinds.TOGGLE_MINING_ASSISTANT.consumeClick()) {
@@ -217,7 +219,7 @@ public class Events {
             CubesideClientFabric.commands.register(dispatcher);
         });
 
-        // FIXME 1.21.9 WorldRenderEvents.BEFORE_DEBUG_RENDER.register(context -> MiningAssistent.render(context.matrixStack()));
+        WorldRenderEvents.BEFORE_DEBUG_RENDER.register(context -> MiningAssistent.render(context.matrices()));
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             ItemStack itemInHand = player.getItemInHand(hand);

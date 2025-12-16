@@ -63,6 +63,9 @@ public class MiningAssistent {
     }
 
     public static void render(PoseStack stack) {
+        if (stack == null) {
+            return;
+        }
         if (startPos == null) {
             startPos = new BlockPos(Configs.MiningAssistent.MiningAssistentStartX.getIntegerValue(), Configs.MiningAssistent.MiningAssistentStartY.getIntegerValue(), Configs.MiningAssistent.MiningAssistentStartZ.getIntegerValue());
         }
@@ -84,12 +87,12 @@ public class MiningAssistent {
                     BlockPos loc = getNextY(new BlockPos(current.x, startPos.getY(), current.z));
                     if (k == radius - 1) {
                         if (dir == MiningDirection.WEST) {
-                            renderTextOnBlock(stack, loc, dir, String.valueOf(i + 2), 16711875);
+                            renderTextOnBlock(stack, loc, dir, String.valueOf(i + 2), 0xFFFF00C3);
                         } else {
-                            renderTextOnBlock(stack, loc, dir, dir.getCornerArrow(), 16407647);
+                            renderTextOnBlock(stack, loc, dir, dir.getCornerArrow(), 0xFFFA5C5F);
                         }
                     } else {
-                        renderTextOnBlock(stack, loc, dir, dir.getArrow(), 4587379); // ↑
+                        renderTextOnBlock(stack, loc, dir, dir.getArrow(), 0xFF45FF73); // ↑
                     }
                 }
                 dir = dir.next();
