@@ -16,7 +16,7 @@ public abstract class MixinCustomHitBox {
     @ModifyConstant(method = "showHitboxes", constant = @Constant(intValue = -1))
     private int hitboxColor(int old) {
         if (!Configs.HitBox.RainbowEntityHitBox.getBooleanValue()) {
-            return old;
+            return Configs.HitBox.EntityHitBoxColor.getColor().toVanillaArgb() | 0xff000000;
         }
         List<Color4f> color4fList = Configs.HitBox.RainbowEntityHitBoxColorList.getColors();
         if (color4fList.isEmpty()) {
