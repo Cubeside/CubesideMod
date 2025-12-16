@@ -28,9 +28,6 @@
     "defaultRequire": 1
   },
   "client": [
-    "CommandHistoryManangerMixin",
-    "MixinEnderDragonEntityRenderer",
-    "MixinEntityRenderDispatcher",
-    "MixinLivingEntityRenderer"
+    "CommandHistoryManangerMixin"
   ]
 }

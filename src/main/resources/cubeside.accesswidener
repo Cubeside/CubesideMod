@@ -3,9 +3,3 @@ accessible class net/minecraft/client/OptionInstance$ValueSet
 extendable class net/minecraft/client/OptionInstance$SliderableValueSet
 accessible    field    net/minecraft/world/item/ShovelItem    FLATTENABLES    Ljava/util/Map;
 accessible    field    net/minecraft/world/item/AxeItem    STRIPPABLES    Ljava/util/Map;
-# unused? (1.21.10) accessible field net/minecraft/client/gui/hud/ChatHud hasUnreadNewMessages Z
-# unused? (1.21.10) accessible field net/minecraft/client/gui/hud/ChatHud messages Ljava/util/List;
-# unused? (1.21.10) accessible field net/minecraft/client/gui/hud/ChatHud visibleMessages Ljava/util/List;
-# unused? (1.21.10) accessible method net/minecraft/client/gui/hud/ChatHud logChatMessage (Lnet/minecraft/client/gui/hud/ChatHudLine;)V
-# unused? (1.21.10) accessible method net/minecraft/client/gui/hud/ChatHud addMessage (Lnet/minecraft/client/gui/hud/ChatHudLine;)V
-# unused? (1.21.10) accessible method net/minecraft/client/gui/hud/ChatHud addVisibleMessage (Lnet/minecraft/client/gui/hud/ChatHudLine;)V
