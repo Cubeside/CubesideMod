@@ -73,7 +73,7 @@ public class SearchScreen extends Screen {
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        // FIXME 1.21.6 this.applyBlur();
+        this.renderBlurredBackground(context);
         this.renderMenuBackground(context);
 
         buttonCache.forEach(this::removeWidget);
