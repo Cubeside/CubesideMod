@@ -27,12 +27,6 @@ public class KeyBinds {
                 GLFW.GLFW_KEY_B,
                 KeyMapping.Category.MISC));
 
-        F3_KEYBINDING = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-                "options.debugscreen",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_F3,
-                KeyMapping.Category.MISC));
-
         AUTO_CHAT = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.cubeside.autochat",
                 InputConstants.Type.KEYSYM,
