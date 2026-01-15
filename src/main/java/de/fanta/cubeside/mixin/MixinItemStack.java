@@ -1,5 +1,6 @@
 package de.fanta.cubeside.mixin;
 
+import de.fanta.cubeside.config.Configs;
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentType;
@@ -24,7 +25,7 @@ public class MixinItemStack {
 
     @Inject(method = "addToTooltip", at = @At(value = "RETURN"))
     private <T extends TooltipProvider> void appendComponentTooltip(DataComponentType<T> componentType, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type, CallbackInfo ci) {
-        if (componentType == DataComponents.ENCHANTMENTS && displayComponent.shows(componentType)) {
+        if (componentType == DataComponents.ENCHANTMENTS && Configs.Generic.ShowAdditionalRepairCosts.getBooleanValue() && displayComponent.shows(componentType)) {
             Integer repairCost = components.get(DataComponents.REPAIR_COST);
             if (repairCost != null && repairCost > 0) {
                 textConsumer.accept(Component.translatable("cubeside.additional_repair_costs").withStyle(ChatFormatting.RED).append(": " + repairCost));
