@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(LevelRenderer.class)
 public abstract class MixinWorldRenderer {
 
-    @ModifyConstant(method = "renderBlockOutline(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;ZLnet/minecraft/client/renderer/state/LevelRenderState;)V", constant = @Constant(intValue = -16777216), expect = 1)
+    @ModifyConstant(method = "renderBlockOutline(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;ZLnet/minecraft/client/renderer/state/level/LevelRenderState;)V", constant = @Constant(intValue = -16777216), expect = 1)
     private int replaceColor(int original) {
         Color color;
         if (Configs.HitBox.RainbowBlockHitBox.getBooleanValue()) {

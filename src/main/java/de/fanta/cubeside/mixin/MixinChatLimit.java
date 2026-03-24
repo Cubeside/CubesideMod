@@ -9,12 +9,12 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 @Mixin(ChatComponent.class)
 public class MixinChatLimit {
 
-    @ModifyConstant(method = "addMessageToQueue(Lnet/minecraft/client/GuiMessage;)V", constant = { @Constant(intValue = 100) })
+    @ModifyConstant(method = "addMessageToQueue(Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V", constant = { @Constant(intValue = 100) })
     private int replaceMessageLimit(int original) {
         return Configs.Chat.ChatMessageLimit.getIntegerValue();
     }
 
-    @ModifyConstant(method = "addMessageToDisplayQueue(Lnet/minecraft/client/GuiMessage;)V", constant = { @Constant(intValue = 100) })
+    @ModifyConstant(method = "addMessageToDisplayQueue(Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V", constant = { @Constant(intValue = 100) })
     private int replaceVisibleMessageLimit(int original) {
         return Configs.Chat.ChatMessageLimit.getIntegerValue();
     }

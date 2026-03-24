@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
 public abstract class InGameHudMixin {
-    @Redirect(method = "renderOverlayMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawStringWithBackdrop(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIII)V"))
+    @Redirect(method = "extractOverlayMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;textWithBackdrop(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIII)V"))
     public void render(GuiGraphicsExtractor instance, Font textRenderer, Component text, int x, int y, int width, int color) {
         if (!Configs.Generic.ActionBarShadow.getBooleanValue()) {
             instance.text(textRenderer, text, x, y, color, false);
@@ -25,7 +25,7 @@ public abstract class InGameHudMixin {
         }
     }
 
-    @Inject(method = "renderHotbarAndDecorations", at = @At(value = "RETURN", opcode = Opcodes.GETFIELD, args = { "log=false" }))
+    @Inject(method = "extractHotbarAndDecorations", at = @At(value = "RETURN", opcode = Opcodes.GETFIELD, args = { "log=false" }))
     private void beforeRenderDebugScreen(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
         FlashColorScreen.onClientTick(context);
     }

@@ -68,7 +68,7 @@ public abstract class MixinChatHud implements ChatHudMethods {
         return sdf.format(DATE);
     }
 
-    @Redirect(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;logChatMessage(Lnet/minecraft/client/GuiMessage;)V"))
+    @Redirect(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;logChatMessage(Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V"))
     private void addMessage(ChatComponent instance, GuiMessage message) {
         if (!CubesideClientFabric.isLoadingMessages()) {
             logChatMessage(message);
@@ -98,15 +98,15 @@ public abstract class MixinChatHud implements ChatHudMethods {
     @Shadow
     public abstract void addMessageToDisplayQueue(GuiMessage message);
 
-    @Inject(method = "render", at = @At(value = "RETURN"))
-    private void renderChatHudInfo(GuiGraphicsExtractor context, Font font, int currentTick, int mouseX, int mouseY, boolean focused, boolean changeCursorOnInsertions, CallbackInfo ci) {
-        if (focused) {
+    @Inject(method = "extractRenderState", at = @At(value = "RETURN"))
+    private void renderChatHudInfo(GuiGraphicsExtractor context, Font font, int currentTick, int mouseX, int mouseY, ChatComponent.DisplayMode displayMode, boolean changeCursorOnInsertions, CallbackInfo ci) {
+        if (displayMode.foreground) {
             chatInfoHud = chatInfoHud != null ? chatInfoHud : new ChatInfoHud();
             chatInfoHud.onRenderChatInfoHud(context);
         }
     }
 
-    @ModifyVariable(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V", at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At("HEAD"), argsOnly = true)
     private Component modifyMessages(Component componentIn) {
         if (CubesideClientFabric.isLoadingMessages()) {
             CubesideClientFabric.messageQueue.add(componentIn);
@@ -348,7 +348,7 @@ public abstract class MixinChatHud implements ChatHudMethods {
         return componentIn;
     }
 
-    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "addServerSystemMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"), cancellable = true)
     private void addMessage(Component message, CallbackInfo ci) {
         if (Configs.Generic.ClickableTpaMessage.getBooleanValue()) {
             if (message.getString().equals("Du kannst diese Anfrage mit /tpdeny ablehnen.") || message.getString().equals("Du kannst die Teleportationsanfrage mit /tpaccept annehmen.") || message.getString().equals("Du kannst die Anfrage mit /tpacancel ablehnen.")) {
