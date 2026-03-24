@@ -8,14 +8,19 @@ import java.awt.Color;
 import java.util.List;
 import net.minecraft.client.renderer.LevelRenderer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(LevelRenderer.class)
 public abstract class MixinWorldRenderer {
 
     @ModifyConstant(method = "renderBlockOutline(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;ZLnet/minecraft/client/renderer/state/level/LevelRenderState;)V", constant = @Constant(intValue = -16777216), expect = 1)
     private int replaceColor(int original) {
+        if (!Configs.HitBox.ModifiedBlockHitBox.getBooleanValue()) {
+            return original;
+        }
         Color color;
         if (Configs.HitBox.RainbowBlockHitBox.getBooleanValue()) {
             List<Color4f> color4fList = Configs.HitBox.RainbowBlockHitBoxColorList.getColors();
@@ -28,5 +33,10 @@ public abstract class MixinWorldRenderer {
             color = new Color(color4f.r, color4f.g, color4f.b);
         }
         return color.getRGB();
+    }
+
+    @ModifyVariable(method = "renderBlockOutline", at = @At("STORE"), ordinal = 0)
+    private int blockHitBoxColor(int old) {
+        return replaceColor(old);
     }
 }

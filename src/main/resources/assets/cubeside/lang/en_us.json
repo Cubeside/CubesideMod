@@ -18,6 +18,7 @@
     "options.cubeside.kickbynotvalidmessage": "Kick when verifying messages.",
     "options.cubeside.showadditionalrepaircosts": "Show additional repair costs for items",
 
+    "options.cubeside.modifiedentityhitbox": "Modify the entity hitbox",
     "options.cubeside.rainbowentityhitbox": "Rainbow entity hitboxes",
     "options.cubeside.rainbowentityhitboxcolorlist": "Rainbow entity hitbox colors",
     "options.cubeside.entityhitboxvisibility": "Entity Hitbox visibility",
@@ -25,6 +26,7 @@
     "options.cubeside.entityhitboxcolor": "Entity Hitbox color",
     "options.cubeside.entityhitboxdirection": "Entity Hitbox looking direction and eyelevel",
 
+    "options.cubeside.modifiedblockhitbox": "Modify the block hitbox",
     "options.cubeside.rainbowblockhitbox": "Rainbow block hitbox",
     "options.cubeside.rainbowblockhitboxcolorlist": "Rainbow block hitbox colors",
     "options.cubeside.blockhitboxvisibility": "Block hitbox visibility",
@@ -66,7 +68,7 @@
     "key.cubeside.editsign": "Toggle Sign Edit",
     "options.cubeside.woodstriping": "Wood striping at right click with axe",
     "options.cubeside.creategrasspath": "Create grass path at right click with shovel",
-    "options.cubeside.singedit": "Edit sign with right click",
+    "options.cubeside.signedit": "Edit sign with right click",
 
     "options.cubeside.countduplicatemessages": "Duplicate messages are summarized, and the count is displayed after the message",
     "options.cubeside.countduplicatemessagesformat": "Duplicate messages count format",

@@ -15,6 +15,9 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 public abstract class MixinCustomHitBox {
     @ModifyConstant(method = "showHitboxes", constant = @Constant(intValue = -1))
     private int hitboxColor(int old) {
+        if (!Configs.HitBox.ModifiedEntityHitBox.getBooleanValue()) {
+            return old;
+        }
         if (!Configs.HitBox.RainbowEntityHitBox.getBooleanValue()) {
             return Configs.HitBox.EntityHitBoxColor.getColor().toVanillaArgb() | 0xff000000;
         }
