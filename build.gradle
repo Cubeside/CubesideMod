@@ -43,6 +43,8 @@ dependencies {
     compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}")
 
     implementation include("fi.dy.masa.malilib:malilib-fabric-26.1-rc-2:${project.malilib_version}")
+    
+    // implementation "de.cubeside.cubesideutils.fabric:CubesideUtilsFabricClient:${project.cubeside_utils_version}"
     implementation "maven.modrinth:cubesideutilsfabricclient:${project.cubeside_utils_version}"
 
     implementation "net.caffeinemc:sodium-fabric:0.8.7-SNAPSHOT+mc26.1-rc-3-local"
