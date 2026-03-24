@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -47,12 +47,12 @@ public class SearchScreen extends Screen {
         this.searchField.setValue("");
         addRenderableWidget(searchField);
 
-        addRenderableWidget(Button.builder(Component.literal("Suchen"), button -> {
+        addRenderableWidget(Button.builder(Component.literal("Suchen"), _ -> {
             String keyword = searchField.getValue();
             filterEntries(keyword);
         }).bounds(320, 35, 100, 20).build());
 
-        addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (button) -> this.minecraft.setScreen(this.parent)).bounds(width / 2 - 50, this.height - 28, 150, 20).build());
+        addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (_) -> this.minecraft.setScreen(this.parent)).bounds(width / 2 - 50, this.height - 28, 150, 20).build());
 
         this.addRenderableWidget(new StringWidget(0, 10, this.width, 9, this.title, this.font));
         resetScrollOffset();
@@ -72,9 +72,9 @@ public class SearchScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        this.renderBlurredBackground(context);
-        this.renderMenuBackground(context);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        this.extractBlurredBackground(context);
+        this.extractMenuBackground(context);
 
         buttonCache.forEach(this::removeWidget);
         buttonCache.clear();
@@ -96,19 +96,19 @@ public class SearchScreen extends Screen {
 
             int textY = y + 5;
             for (FormattedCharSequence line : lines) {
-                context.drawString(font, line, TEXT_MARGIN + 5, textY, Color.white.getRGB(), true);
+                context.text(font, line, TEXT_MARGIN + 5, textY, Color.white.getRGB(), true);
                 textY += this.font.lineHeight;
             }
 
-            Button buttonWidget = Button.builder(Component.literal("Copy"), button -> Minecraft.getInstance().keyboardHandler.setClipboard(entry.getString())).bounds(this.width - 70, y, 60, 20).build();
+            Button buttonWidget = Button.builder(Component.literal("Copy"), _ -> Minecraft.getInstance().keyboardHandler.setClipboard(entry.getString())).bounds(this.width - 70, y, 60, 20).build();
             addRenderableWidget(buttonWidget);
             buttonCache.add(buttonWidget);
         }
-        super.render(context, mouseX, mouseY, delta);
+        super.extractRenderState(context, mouseX, mouseY, delta);
     }
 
     @Override
-    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         // NOTHING :>
     }
 

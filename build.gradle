@@ -1,7 +1,7 @@
 plugins {
-    id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
     id 'maven-publish'
-    id "com.modrinth.minotaur" version "2.4.3"
+    id "com.modrinth.minotaur" version "2.9.0"
 }
 
 defaultTasks('clean', 'build', 'publishToMavenLocal')
@@ -35,18 +35,18 @@ repositories {
 dependencies {
     //to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modApi("com.terraformersmc:modmenu:${project.modmenu_version}")
+    compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}")
 
-    modImplementation include("fi.dy.masa.malilib:malilib-fabric-1.21.11:${project.malilib_version}")
-    modImplementation "de.cubeside.cubesideutils.fabric:CubesideUtilsFabricClient:${project.cubeside_utils_version}"
+    implementation include("fi.dy.masa.malilib:malilib-fabric-26.1-rc-2:${project.malilib_version}")
+    implementation "de.cubeside.cubesideutils.fabric:CubesideUtilsFabricClient:${project.cubeside_utils_version}"
 
-    modImplementation "maven.modrinth:sodium:${project.sodium_version}"
+    implementation "net.caffeinemc:sodium-fabric:0.8.7-SNAPSHOT+mc26.1-rc-3-local"
+    // implementation "maven.modrinth:sodium:${project.sodium_version}"
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
@@ -68,7 +68,7 @@ loom {
     }
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
     if (targetJavaVersion >= 21 || JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
@@ -83,8 +83,8 @@ base {
 java {
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
@@ -119,7 +119,7 @@ modrinth {
     versionName = "CubesideMod ${project.minecraft_version}-${project.mod_version}"
     versionType = isMCVersionNonRelease() ? "beta" : "release"
     changelog = file("changelog.md").text
-    uploadFile = remapJar
+    uploadFile = jar
     gameVersions = [ project.minecraft_version ]
     loaders = [ "fabric" ]
     dependencies {

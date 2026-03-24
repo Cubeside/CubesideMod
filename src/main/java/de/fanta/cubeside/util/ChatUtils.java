@@ -31,8 +31,8 @@ public class ChatUtils {
 
     public static void sendMessage(Object message) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player != null ) {
-            mc.player.displayClientMessage(Component.nullToEmpty(CubesideClientFabric.PREFIX + message), false);
+        if (mc.player != null) {
+            Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty(CubesideClientFabric.PREFIX + message), false);
         }
     }
 

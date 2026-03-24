@@ -23,7 +23,7 @@ public abstract class MixinCustomPauseMenu extends Screen {
 
     @Inject(at = @At("TAIL"), method = "createPauseMenu")
     private void addCustomButton(CallbackInfo ci) {
-        this.addRenderableWidget(Button.builder(Component.translatable("custombutton.cubeside.options"), button -> GuiBase.openGui(new ConfigGui())).bounds(this.width / 2 - 100 + 205, this.height / 4 + 72 - 15, 100, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("custombutton.cubeside.options"), _ -> GuiBase.openGui(new ConfigGui())).bounds(this.width / 2 - 100 + 205, this.height / 4 + 72 - 15, 100, 20).build());
         if (CubesideClientFabric.getChatDatabase() != null) {
             if (minecraft == null) {
                 return;
@@ -31,7 +31,7 @@ public abstract class MixinCustomPauseMenu extends Screen {
 
             ClientLevel world = this.minecraft.level;
             if (world != null) {
-                this.addRenderableWidget(Button.builder(Component.literal("ChatLog (Beta)"), button -> minecraft.setScreen(new SearchScreen(this, world.registryAccess()))).bounds(this.width / 2 - 100 + 205, this.height / 4 + 72 - 16 + 25, 100, 20).build());
+                this.addRenderableWidget(Button.builder(Component.literal("ChatLog (Beta)"), _ -> minecraft.setScreen(new SearchScreen(this, world.registryAccess()))).bounds(this.width / 2 - 100 + 205, this.height / 4 + 72 - 16 + 25, 100, 20).build());
             }
         }
     }

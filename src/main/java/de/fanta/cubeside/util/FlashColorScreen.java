@@ -1,8 +1,8 @@
 package de.fanta.cubeside.util;
 
-import java.awt.*;
+import java.awt.Color;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class FlashColorScreen {
     private static boolean isRunning = false;
@@ -18,7 +18,7 @@ public class FlashColorScreen {
         }
     }
 
-    public static void onClientTick(GuiGraphics drawContext) {
+    public static void onClientTick(GuiGraphicsExtractor drawContext) {
         if (isRunning && counter < duration) {
             Minecraft mc = Minecraft.getInstance();
             int width = mc.getWindow().getGuiScaledWidth();

@@ -15,13 +15,11 @@ import fi.dy.masa.malilib.config.options.ConfigDouble;
 import fi.dy.masa.malilib.config.options.ConfigInteger;
 import fi.dy.masa.malilib.config.options.ConfigString;
 import fi.dy.masa.malilib.config.options.ConfigStringList;
-import fi.dy.masa.malilib.util.JsonUtils;
 import fi.dy.masa.malilib.util.data.Color4f;
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import net.minecraft.network.chat.Component;
+import org.apache.commons.io.FileUtils;
 
 public class Configs implements IConfigHandler {
 
@@ -62,8 +60,7 @@ public class Configs implements IConfigHandler {
                 ShowAdditionalRepairCosts,
                 FastJoinButtonText,
                 FastJoinButtonIP,
-                FastJoinButtonPort
-        );
+                FastJoinButtonPort);
     }
 
     public static class Chat {
@@ -86,8 +83,7 @@ public class Configs implements IConfigHandler {
                 DisplayChatInfo,
                 CountDuplicateMessages,
                 CountDuplicateMessagesFormat,
-                CountDuplicateMessagesColor
-        );
+                CountDuplicateMessagesColor);
     }
 
     public static class ChunkLoading {
@@ -98,26 +94,26 @@ public class Configs implements IConfigHandler {
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 FullVerticalView,
                 UnloadChunks,
-                FakeViewDistance
-        );
+                FakeViewDistance);
     }
 
     public static class Fun {
         public static final ConfigBoolean DisableChristmasChest = new ConfigBoolean("DisableChristmasChest", false, Component.translatable("options.cubeside.removechristmaschest").getString());
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                DisableChristmasChest
-        );
+                DisableChristmasChest);
     }
 
     public static class HitBox {
         public static final ConfigBoolean RainbowEntityHitBox = new ConfigBoolean("RainbowEntityHitBox", false, Component.translatable("options.cubeside.rainbowentityhitbox").getString());
-        public static final ConfigColorList RainbowEntityHitBoxColorList = new ConfigColorList("RainbowEntityHitBoxColorList", ImmutableList.of(Color4f.fromColor(16711684), Color4f.fromColor(16754176), Color4f.fromColor(16769280), Color4f.fromColor(65305), Color4f.fromColor(35071), Color4f.fromColor(13959423)), Component.translatable("options.cubeside.rainbowentityhitboxcolorlist").getString());
+        public static final ConfigColorList RainbowEntityHitBoxColorList = new ConfigColorList("RainbowEntityHitBoxColorList",
+                ImmutableList.of(Color4f.fromColor(16711684), Color4f.fromColor(16754176), Color4f.fromColor(16769280), Color4f.fromColor(65305), Color4f.fromColor(35071), Color4f.fromColor(13959423)), Component.translatable("options.cubeside.rainbowentityhitboxcolorlist").getString());
         public static final ConfigDouble RainbowEntityHitBoxSpeed = new ConfigDouble("RainbowEntityHitBoxSpeed", 0.1, 0.0, 1.0, true, Component.translatable("options.cubeside.rainbowentityhitboxspeed").getString());
         public static final ConfigDouble EntityHitBoxVisibility = new ConfigDouble("EntityHitBoxVisibility", 1, 0.0, 1, true, Component.translatable("options.cubeside.entityhitboxvisibility").getString());
         public static final ConfigColor EntityHitBoxColor = new ConfigColor("EntityHitBoxColor", "#ffffff", Component.translatable("options.cubeside.entityhitboxcolor").getString());
         public static final ConfigBoolean EntityHitBoxDirection = new ConfigBoolean("EntityHitBoxDirection", true, Component.translatable("options.cubeside.entityhitboxdirection").getString());
         public static final ConfigBoolean RainbowBlockHitBox = new ConfigBoolean("RainbowBlockHitBox", false, Component.translatable("options.cubeside.rainbowblockhitbox").getString());
-        public static final ConfigColorList RainbowBlockHitBoxColorList = new ConfigColorList("RainbowBlockHitBoxColorList", ImmutableList.of(Color4f.fromColor(16711684), Color4f.fromColor(16754176), Color4f.fromColor(16769280), Color4f.fromColor(65305), Color4f.fromColor(35071), Color4f.fromColor(13959423)), Component.translatable("options.cubeside.rainbowblockhitboxcolorlist").getString());
+        public static final ConfigColorList RainbowBlockHitBoxColorList = new ConfigColorList("RainbowBlockHitBoxColorList",
+                ImmutableList.of(Color4f.fromColor(16711684), Color4f.fromColor(16754176), Color4f.fromColor(16769280), Color4f.fromColor(65305), Color4f.fromColor(35071), Color4f.fromColor(13959423)), Component.translatable("options.cubeside.rainbowblockhitboxcolorlist").getString());
         public static final ConfigDouble RainbowBlockHitBoxSpeed = new ConfigDouble("RainbowBlockHitBoxSpeed", 0.1, 0.0, 1, true, Component.translatable("options.cubeside.rainbowblockhitboxspeed").getString());
         public static final ConfigDouble BlockHitBoxVisibility = new ConfigDouble("BlockHitBoxVisibility", 0.4, 0.0, 1, true, Component.translatable("options.cubeside.blockhitboxvisibility").getString());
         public static final ConfigColor BlockHitBoxColor = new ConfigColor("BlockHitBoxColor", "#000000", Component.translatable("options.cubeside.blockhitboxcolor").getString());
@@ -132,13 +128,11 @@ public class Configs implements IConfigHandler {
                 RainbowBlockHitBoxColorList,
                 RainbowBlockHitBoxSpeed,
                 BlockHitBoxColor,
-                BlockHitBoxVisibility
-        );
+                BlockHitBoxVisibility);
 
         public static final ConfigBoolean ShowHitBox = new ConfigBoolean("ShowHitBox", false, Component.translatable("options.cubeside.showhitbox").getString());
         public static final ImmutableList<IConfigBase> INVISIBLE_OPTIONS = ImmutableList.of(
-                ShowHitBox
-        );
+                ShowHitBox);
     }
 
     public static class MiningAssistent {
@@ -148,8 +142,7 @@ public class Configs implements IConfigHandler {
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 MiningAssistentEnabled,
                 MiningAssistentDistance,
-                MiningAssistentCircles
-        );
+                MiningAssistentCircles);
 
         public static final ConfigInteger MiningAssistentStartX = new ConfigInteger("MiningAssistentStartX", 0, Component.translatable("options.cubeside.miningassistentstartx").getString());
         public static final ConfigInteger MiningAssistentStartY = new ConfigInteger("MiningAssistentStartY", 0, Component.translatable("options.cubeside.miningassistentstarty").getString());
@@ -157,15 +150,13 @@ public class Configs implements IConfigHandler {
         public static final ImmutableList<IConfigBase> INVISIBLE_OPTIONS = ImmutableList.of(
                 MiningAssistentStartX,
                 MiningAssistentStartY,
-                MiningAssistentStartZ
-        );
+                MiningAssistentStartZ);
     }
 
     public static class Fixes {
         public static final ConfigBoolean SimpleSignGlow = new ConfigBoolean("SimpleSignGlow", false, Component.translatable("options.cubeside.simplesignglow").getString());
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                SimpleSignGlow
-        );
+                SimpleSignGlow);
     }
 
     public static class PermissionSettings {
@@ -176,12 +167,11 @@ public class Configs implements IConfigHandler {
         public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
                 AutoChat,
                 AutoChatAntwort,
-                AdminList
-        );
+                AdminList);
     }
 
     public static void loadFromFile() {
-        File oldConfigFile = new File(fi.dy.masa.malilib.util.FileUtils.getConfigDirectoryAsPath().toFile(), CONFIG_FILE_NAME);
+        File oldConfigFile = new File(fi.dy.masa.malilib.util.FileUtils.getConfigDirectory().toFile(), CONFIG_FILE_NAME);
         File configFile = new File(CubesideClientFabric.getConfigDirectory(), CONFIG_FILE_NAME);
         if (oldConfigFile.exists()) {
             try {
@@ -196,7 +186,7 @@ public class Configs implements IConfigHandler {
         }
 
         if (configFile.exists() && configFile.isFile() && configFile.canRead()) {
-            JsonElement element = JsonUtils.parseJsonFile(configFile);
+            JsonElement element = fi.dy.masa.malilib.util.data.json.JsonUtils.parseJsonFile(configFile.toPath());
 
             if (element != null && element.isJsonObject()) {
                 JsonObject root = element.getAsJsonObject();
@@ -233,7 +223,7 @@ public class Configs implements IConfigHandler {
 
             root.add("config_version", new JsonPrimitive(CONFIG_VERSION));
 
-            JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME));
+            fi.dy.masa.malilib.util.data.json.JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME).toPath());
 
             CubesideClientFabric.LOGGER.info("[CubesideMod] Config Saved");
         }

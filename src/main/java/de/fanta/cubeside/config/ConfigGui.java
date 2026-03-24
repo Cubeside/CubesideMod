@@ -8,11 +8,10 @@ import fi.dy.masa.malilib.gui.button.ButtonBase;
 import fi.dy.masa.malilib.gui.button.ButtonGeneric;
 import fi.dy.masa.malilib.gui.button.IButtonActionListener;
 import fi.dy.masa.malilib.util.StringUtils;
-
 import java.util.Collections;
 import java.util.List;
 
-public class ConfigGui extends GuiConfigsBase { //GuiBase.openGui(new ConfigGui()); <-- Open GUI
+public class ConfigGui extends GuiConfigsBase { // GuiBase.openGui(new ConfigGui()); <-- Open GUI
     private static ConfigGuiTab tab = ConfigGuiTab.GENERIC;
 
     public ConfigGui() {
@@ -42,11 +41,12 @@ public class ConfigGui extends GuiConfigsBase { //GuiBase.openGui(new ConfigGui(
 
     @Override
     protected int getConfigWidth() {
-        ConfigGuiTab tab = ConfigGui.tab;
-
-        /*if (tab == ConfigGuiTab.GENERIC || tab == ConfigGuiTab.CHUNKLOADING) {
-            return 100;
-        }*/
+        /*
+         * ConfigGuiTab tab = ConfigGui.tab;
+         * if (tab == ConfigGuiTab.GENERIC || tab == ConfigGuiTab.CHUNKLOADING) {
+         * return 100;
+         * }
+         */
 
         return super.getConfigWidth();
     }
@@ -89,9 +89,8 @@ public class ConfigGui extends GuiConfigsBase { //GuiBase.openGui(new ConfigGui(
         }
 
         Configs.saveToFile();
-        //this.client.keyboard.setRepeatEvents(false);
+        // this.client.keyboard.setRepeatEvents(false);
     }
-
 
     private static class ButtonListener implements IButtonActionListener {
         private final ConfigGui parent;

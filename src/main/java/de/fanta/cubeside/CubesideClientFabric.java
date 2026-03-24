@@ -6,11 +6,9 @@ import de.fanta.cubeside.event.CubesideModChannelHandler;
 import de.fanta.cubeside.util.ChatInfo;
 import de.iani.cubesideutils.fabric.scheduler.Scheduler;
 import fi.dy.masa.malilib.util.FileUtils;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -45,7 +43,7 @@ public class CubesideClientFabric implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        configDirectory = new File(FileUtils.getConfigDirectoryAsPath() + "/CubesideMod");
+        configDirectory = new File(FileUtils.getConfigDirectory() + "/CubesideMod");
         if (!configDirectory.isDirectory()) {
             configDirectory.mkdirs();
         }

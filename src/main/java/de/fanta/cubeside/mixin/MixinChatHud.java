@@ -12,14 +12,15 @@ import de.iani.cubesideutils.fabric.permission.PermissionHandler;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import net.minecraft.client.GuiMessage;
-import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ComponentRenderUtils;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
@@ -98,7 +99,7 @@ public abstract class MixinChatHud implements ChatHudMethods {
     public abstract void addMessageToDisplayQueue(GuiMessage message);
 
     @Inject(method = "render", at = @At(value = "RETURN"))
-    private void renderChatHudInfo(GuiGraphics context, Font font, int currentTick, int mouseX, int mouseY, boolean focused, boolean changeCursorOnInsertions, CallbackInfo ci) {
+    private void renderChatHudInfo(GuiGraphicsExtractor context, Font font, int currentTick, int mouseX, int mouseY, boolean focused, boolean changeCursorOnInsertions, CallbackInfo ci) {
         if (focused) {
             chatInfoHud = chatInfoHud != null ? chatInfoHud : new ChatInfoHud();
             chatInfoHud.onRenderChatInfoHud(context);
@@ -375,7 +376,7 @@ public abstract class MixinChatHud implements ChatHudMethods {
 
     @Override
     public void cubesideMod$addStoredChatMessage(Component message) {
-        this.addMessageToDisplayQueue(new GuiMessage(0, message, null, new GuiMessageTag(10631423, null, Component.literal("*"), null)));
+        this.addMessageToDisplayQueue(new GuiMessage(0, message, null, GuiMessageSource.SYSTEM_SERVER, new GuiMessageTag(10631423, null, Component.literal("*"), null)));
     }
 
     @Override

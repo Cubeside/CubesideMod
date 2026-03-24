@@ -2,10 +2,10 @@ package de.fanta.cubeside;
 
 import de.fanta.cubeside.config.Configs;
 import de.fanta.cubeside.util.ChatInfo;
-import java.awt.*;
+import java.awt.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -28,13 +28,13 @@ public class ChatInfoHud {
         }
     }
 
-    public void onRenderChatInfoHud(GuiGraphics context) {
+    public void onRenderChatInfoHud(GuiGraphicsExtractor context) {
         if (Configs.Chat.DisplayChatInfo.getBooleanValue() && CubesideClientFabric.getChatInfo() != null) {
             renderChatInfoHud(context, CubesideClientFabric.getChatInfo());
         }
     }
 
-    private void renderChatInfoHud(GuiGraphics context, ChatInfo chatInfo) {
+    private void renderChatInfoHud(GuiGraphicsExtractor context, ChatInfo chatInfo) {
         MutableComponent currentChannelText = Component.literal("Aktueller Chat: ");
         MutableComponent currentChannelColorText = chatInfo.isPrivatChat() ? chatInfo.getColoredPrivatText() : chatInfo.getColoredChannelText();
         currentChannelText.append(currentChannelColorText);
@@ -50,9 +50,9 @@ public class ChatInfoHud {
         context.fill(2, height - 2, getWith(getWith(0, currentResponseText.getString()), currentChannelText.getString()) + 8, !chatInfo.hasResponsePlayer() ? height + 10 : height + 20, minecraft.options.getBackgroundColor(Integer.MIN_VALUE));
 
         result.width = getWith(result.width, currentChannelText.getString());
-        context.drawString(this.fontRenderer, currentChannelText, 5, (minecraft.getWindow().getGuiScaledHeight() - (result.height + 70 / 2)), Color.WHITE.getRGB(), true);
+        context.text(this.fontRenderer, currentChannelText, 5, (minecraft.getWindow().getGuiScaledHeight() - (result.height + 70 / 2)), Color.WHITE.getRGB(), true);
         result.height -= distance;
-        context.drawString(this.fontRenderer, currentResponseText, 5, (minecraft.getWindow().getGuiScaledHeight() - (result.height + 70 / 2)), Color.WHITE.getRGB(), true);
+        context.text(this.fontRenderer, currentResponseText, 5, (minecraft.getWindow().getGuiScaledHeight() - (result.height + 70 / 2)), Color.WHITE.getRGB(), true);
 
         if (result.width != 0) {
             result.width += 20;

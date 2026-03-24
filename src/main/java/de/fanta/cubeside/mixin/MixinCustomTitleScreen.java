@@ -51,7 +51,7 @@ public abstract class MixinCustomTitleScreen extends Screen {
     @Inject(at = @At("HEAD"), method = "createNormalMenuOptions")
     private void addCustomButton(int y, int spacingY, CallbackInfoReturnable<Integer> cir) {
         if (!Configs.Generic.FastJoinButtonText.getStringValue().isBlank() && !Configs.Generic.FastJoinButtonIP.getStringValue().isBlank()) {
-            this.addRenderableWidget(Button.builder(Component.literal(Configs.Generic.FastJoinButtonText.getStringValue()), button -> {
+            this.addRenderableWidget(Button.builder(Component.literal(Configs.Generic.FastJoinButtonText.getStringValue()), _ -> {
                 if (selectedEntry != null) {
                     ConnectScreen.startConnecting(this, Minecraft.getInstance(), serverAddress, selectedEntry, false, null);
                 }

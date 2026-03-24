@@ -11,8 +11,8 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 public class CubesideModChannelHandler implements ClientPlayNetworking.PlayPayloadHandler<CubesideDataS2C>, ClientConfigurationNetworking.ConfigurationPayloadHandler<CubesideDataS2C> {
 
     public CubesideModChannelHandler() {
-        PayloadTypeRegistry.playS2C().register(CubesideDataS2C.PACKET_ID, CubesideDataS2C.PACKET_CODEC);
-        PayloadTypeRegistry.configurationS2C().register(CubesideDataS2C.PACKET_ID, CubesideDataS2C.PACKET_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(CubesideDataS2C.PACKET_ID, CubesideDataS2C.PACKET_CODEC);
+        PayloadTypeRegistry.clientboundConfiguration().register(CubesideDataS2C.PACKET_ID, CubesideDataS2C.PACKET_CODEC);
 
         ClientPlayNetworking.registerGlobalReceiver(CubesideDataS2C.PACKET_ID, this);
         ClientConfigurationNetworking.registerGlobalReceiver(CubesideDataS2C.PACKET_ID, this);
