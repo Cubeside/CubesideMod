@@ -17,7 +17,7 @@ public class MixinGameModeSwitch {
     public void behaviour(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
         if (Configs.Generic.GamemodeSwitcher.getBooleanValue()) {
             if (input.input() == 293) {
-                Minecraft.getInstance().setScreen(new GameModeSwitcherScreen());
+                Minecraft.getInstance().setScreenAndShow(new GameModeSwitcherScreen());
                 cir.setReturnValue(true);
             }
         }

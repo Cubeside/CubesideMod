@@ -9,14 +9,14 @@ import java.util.List;
 import net.minecraft.client.renderer.LevelRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(LevelRenderer.class)
 public abstract class MixinWorldRenderer {
 
-    @ModifyConstant(method = "renderBlockOutline(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;ZLnet/minecraft/client/renderer/state/level/LevelRenderState;)V", constant = @Constant(intValue = -16777216), expect = 1)
+    private static final String SUBMIT_BLOCK_OUTLINE = "submitBlockOutline(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/LevelRenderState;)V";
+    private static final String SUBMIT_HIT_OUTLINE = "Lnet/minecraft/client/renderer/LevelRenderer;submitHitOutline(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/state/level/BlockOutlineRenderState;IFZ)V";
+
     private int replaceColor(int original) {
         if (!Configs.HitBox.ModifiedBlockHitBox.getBooleanValue()) {
             return original;
@@ -35,8 +35,13 @@ public abstract class MixinWorldRenderer {
         return color.getRGB();
     }
 
-    @ModifyVariable(method = "renderBlockOutline", at = @At("STORE"), ordinal = 0)
-    private int blockHitBoxColor(int old) {
-        return replaceColor(old);
+    @ModifyArg(method = SUBMIT_BLOCK_OUTLINE, at = @At(value = "INVOKE", target = SUBMIT_HIT_OUTLINE, ordinal = 0), index = 4)
+    private int blockHitBoxHighContrastColor(int original) {
+        return replaceColor(original);
+    }
+
+    @ModifyArg(method = SUBMIT_BLOCK_OUTLINE, at = @At(value = "INVOKE", target = SUBMIT_HIT_OUTLINE, ordinal = 1), index = 4)
+    private int blockHitBoxColor(int original) {
+        return replaceColor(original);
     }
 }

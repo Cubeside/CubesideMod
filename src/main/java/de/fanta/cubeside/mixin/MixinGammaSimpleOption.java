@@ -2,10 +2,10 @@ package de.fanta.cubeside.mixin;
 
 import com.mojang.serialization.Codec;
 import de.fanta.cubeside.util.BoostedSliderCallbacks;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
+import net.minecraft.client.OptionInstance.ValueUpdateListener;
 import net.minecraft.client.OptionInstance.ValueSet;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
@@ -43,9 +43,9 @@ public class MixinGammaSimpleOption {
     @Shadow
     @Final
     @Mutable
-    Consumer<Double> onValueUpdate;
+    ValueUpdateListener<Double> onValueUpdate;
 
-    @Inject(at = @At("RETURN"), method = "<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V")
+    @Inject(at = @At("RETURN"), method = "<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Lnet/minecraft/client/OptionInstance$ValueUpdateListener;)V")
     private void init(CallbackInfo info) {
         ComponentContents content = this.caption.getContents();
         if (!(content instanceof TranslatableContents translatableTextContent)) {

@@ -5,9 +5,11 @@ import de.fanta.cubeside.config.Configs;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -62,7 +64,7 @@ public class MiningAssistent {
         }
     }
 
-    public static void render(PoseStack stack) {
+    public static void render(PoseStack stack, SubmitNodeCollector submitNodeCollector) {
         if (stack == null) {
             return;
         }
@@ -71,11 +73,11 @@ public class MiningAssistent {
         }
 
         if (Configs.MiningAssistent.MiningAssistentEnabled.getBooleanValue() && startPos != null) {
-            spawnParticleSpiral(stack, Configs.MiningAssistent.MiningAssistentDistance.getIntegerValue(), Configs.MiningAssistent.MiningAssistentCircles.getIntegerValue());
+            spawnParticleSpiral(stack, submitNodeCollector, Configs.MiningAssistent.MiningAssistentDistance.getIntegerValue(), Configs.MiningAssistent.MiningAssistentCircles.getIntegerValue());
         }
     }
 
-    public static void spawnParticleSpiral(PoseStack stack, int distance, int circles) {
+    public static void spawnParticleSpiral(PoseStack stack, SubmitNodeCollector submitNodeCollector, int distance, int circles) {
         Point current = new Point(startPos.getX(), startPos.getZ());
         double radius = 0;
 
@@ -87,12 +89,12 @@ public class MiningAssistent {
                     BlockPos loc = getNextY(new BlockPos(current.x, startPos.getY(), current.z));
                     if (k == radius - 1) {
                         if (dir == MiningDirection.WEST) {
-                            renderTextOnBlock(stack, loc, dir, String.valueOf(i + 2), 0xFFFF00C3);
+                            renderTextOnBlock(stack, submitNodeCollector, loc, dir, String.valueOf(i + 2), 0xFFFF00C3);
                         } else {
-                            renderTextOnBlock(stack, loc, dir, dir.getCornerArrow(), 0xFFFA5C5F);
+                            renderTextOnBlock(stack, submitNodeCollector, loc, dir, dir.getCornerArrow(), 0xFFFA5C5F);
                         }
                     } else {
-                        renderTextOnBlock(stack, loc, dir, dir.getArrow(), 0xFF45FF73); // ↑
+                        renderTextOnBlock(stack, submitNodeCollector, loc, dir, dir.getArrow(), 0xFF45FF73); // ↑
                     }
                 }
                 dir = dir.next();
@@ -126,10 +128,9 @@ public class MiningAssistent {
         Configs.saveToFile();
     }
 
-    public static void renderTextOnBlock(PoseStack matrixStack, BlockPos pos, MiningDirection direction, String string, int color) {
+    public static void renderTextOnBlock(PoseStack matrixStack, SubmitNodeCollector submitNodeCollector, BlockPos pos, MiningDirection direction, String string, int color) {
         BlockPos down = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
-        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
-        MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
+        Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
         Level world = Minecraft.getInstance().level;
         String text = String.valueOf(string);
         Font font = Minecraft.getInstance().font;
@@ -146,7 +147,7 @@ public class MiningAssistent {
         float size = 0.07F;
         matrixStack.scale(-size, -size, size);
         float float_3 = (-font.width(text)) / 2.0F + 0.4f;
-        font.drawInBatch(text, float_3, -3.5f, color, false, matrixStack.last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
+        submitNodeCollector.submitText(matrixStack, float_3, -3.5f, FormattedCharSequence.forward(text, Style.EMPTY), false, Font.DisplayMode.NORMAL, 15728880, color, 0, 0);
         matrixStack.popPose();
     }
 }

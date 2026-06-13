@@ -52,7 +52,7 @@ public class SearchScreen extends Screen {
             filterEntries(keyword);
         }).bounds(320, 35, 100, 20).build());
 
-        addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (_) -> this.minecraft.setScreen(this.parent)).bounds(width / 2 - 50, this.height - 28, 150, 20).build());
+        addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, (_) -> this.minecraft.setScreenAndShow(this.parent)).bounds(width / 2 - 50, this.height - 28, 150, 20).build());
 
         this.addRenderableWidget(new StringWidget(0, 10, this.width, 9, this.title, this.font));
         resetScrollOffset();

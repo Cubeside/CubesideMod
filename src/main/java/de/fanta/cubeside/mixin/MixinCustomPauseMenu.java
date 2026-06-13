@@ -31,7 +31,7 @@ public abstract class MixinCustomPauseMenu extends Screen {
 
             ClientLevel world = this.minecraft.level;
             if (world != null) {
-                this.addRenderableWidget(Button.builder(Component.literal("ChatLog (Beta)"), _ -> minecraft.setScreen(new SearchScreen(this, world.registryAccess()))).bounds(this.width / 2 - 100 + 205, this.height / 4 + 72 - 16 + 25, 100, 20).build());
+                this.addRenderableWidget(Button.builder(Component.literal("ChatLog (Beta)"), _ -> minecraft.setScreenAndShow(new SearchScreen(this, world.registryAccess()))).bounds(this.width / 2 - 100 + 205, this.height / 4 + 72 - 16 + 25, 100, 20).build());
             }
         }
     }

@@ -83,17 +83,17 @@ public class Events {
                         List<Component> messages = CubesideClientFabric.getChatDatabase().loadMessages(Configs.Chat.ChatMessageLimit.getIntegerValue());
                         List<String> commands = CubesideClientFabric.getChatDatabase().loadCommands();
 
-                        client.gui.getChat().clearMessages(true);
+                        client.gui.hud.getChat().clearMessages(true);
                         if (messages != null) {
-                            messages.forEach(((ChatHudMethods) client.gui.getChat())::cubesideMod$addStoredChatMessage);
+                            messages.forEach(((ChatHudMethods) client.gui.hud.getChat())::cubesideMod$addStoredChatMessage);
                         }
                         if (commands != null) {
-                            commands.forEach(((ChatHudMethods) client.gui.getChat())::cubesideMod$addStoredCommand);
+                            commands.forEach(((ChatHudMethods) client.gui.hud.getChat())::cubesideMod$addStoredCommand);
                         }
                     } finally {
                         CubesideClientFabric.setLoadingMessages(false);
 
-                        CubesideClientFabric.messageQueue.forEach(text -> client.gui.getChat().addServerSystemMessage(text));
+                        CubesideClientFabric.messageQueue.forEach(text -> client.gui.hud.getChat().addServerSystemMessage(text));
                         CubesideClientFabric.messageQueue.clear();
 
                     }
@@ -152,10 +152,10 @@ public class Events {
                     if (PermissionHandler.hasPermission("cubeside.autochat")) {
                         if (Configs.PermissionSettings.AutoChat.getBooleanValue()) {
                             Configs.PermissionSettings.AutoChat.setBooleanValue(false);
-                            Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty("§cAuto Chat deaktiviert"), true);
+                            Minecraft.getInstance().gui.chatListener().handleSystemMessage(Component.nullToEmpty("§cAuto Chat deaktiviert"), true);
                         } else {
                             Configs.PermissionSettings.AutoChat.setBooleanValue(true);
-                            Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty("§aAuto Chat aktiviert"), true);
+                            Minecraft.getInstance().gui.chatListener().handleSystemMessage(Component.nullToEmpty("§aAuto Chat aktiviert"), true);
                         }
                         Configs.saveToFile();
                     } else {
@@ -166,41 +166,41 @@ public class Events {
                 while (KeyBinds.TOGGLE_SHOW_ENTITIES_IN_SPECTATOR_MODE.consumeClick()) {
                     if (Configs.Generic.ShowInvisibleEntitiesInSpectator.getBooleanValue()) {
                         Configs.Generic.ShowInvisibleEntitiesInSpectator.setBooleanValue(false);
-                        Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty("§aUnsichtbare Entities werden jetzt im Spectator nicht mehr angezeigt!"), true);
+                        Minecraft.getInstance().gui.chatListener().handleSystemMessage(Component.nullToEmpty("§aUnsichtbare Entities werden jetzt im Spectator nicht mehr angezeigt!"), true);
                     } else {
                         Configs.Generic.ShowInvisibleEntitiesInSpectator.setBooleanValue(true);
-                        Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty("§aUnsichtbare Entities werden jetzt im Spectator wieder angezeigt!"), true);
+                        Minecraft.getInstance().gui.chatListener().handleSystemMessage(Component.nullToEmpty("§aUnsichtbare Entities werden jetzt im Spectator wieder angezeigt!"), true);
                     }
                     Configs.saveToFile();
                 }
 
                 while (KeyBinds.SET_MINING_ASSISTANT_START_POINT.consumeClick()) {
                     MiningAssistent.setStartPos(Minecraft.getInstance().player.blockPosition());
-                    Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty("MiningAssistent start position set"), true);
+                    Minecraft.getInstance().gui.chatListener().handleSystemMessage(Component.nullToEmpty("MiningAssistent start position set"), true);
                 }
 
                 while (KeyBinds.TOGGLE_MINING_ASSISTANT.consumeClick()) {
                     Configs.MiningAssistent.MiningAssistentEnabled.setBooleanValue(!Configs.MiningAssistent.MiningAssistentEnabled.getBooleanValue());
                     Configs.saveToFile();
-                    Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty("MiningAssistent set to: " + (Configs.MiningAssistent.MiningAssistentEnabled.getBooleanValue() ? "§atrue" : "§cfalse")), true);
+                    Minecraft.getInstance().gui.chatListener().handleSystemMessage(Component.nullToEmpty("MiningAssistent set to: " + (Configs.MiningAssistent.MiningAssistentEnabled.getBooleanValue() ? "§atrue" : "§cfalse")), true);
                 }
 
                 while (KeyBinds.WOOD_STRIPING.consumeClick()) {
                     Configs.Generic.WoodStriping.setBooleanValue(!Configs.Generic.WoodStriping.getBooleanValue());
                     Configs.saveToFile();
-                    Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty("WoodStriping set to: " + (Configs.Generic.WoodStriping.getBooleanValue() ? "§atrue" : "§cfalse")), true);
+                    Minecraft.getInstance().gui.chatListener().handleSystemMessage(Component.nullToEmpty("WoodStriping set to: " + (Configs.Generic.WoodStriping.getBooleanValue() ? "§atrue" : "§cfalse")), true);
                 }
 
                 while (KeyBinds.CREATE_GRASS_PATH.consumeClick()) {
                     Configs.Generic.CreateGrassPath.setBooleanValue(!Configs.Generic.CreateGrassPath.getBooleanValue());
                     Configs.saveToFile();
-                    Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty("CreateGrassPath set to: " + (Configs.Generic.CreateGrassPath.getBooleanValue() ? "§atrue" : "§cfalse")), true);
+                    Minecraft.getInstance().gui.chatListener().handleSystemMessage(Component.nullToEmpty("CreateGrassPath set to: " + (Configs.Generic.CreateGrassPath.getBooleanValue() ? "§atrue" : "§cfalse")), true);
                 }
 
                 while (KeyBinds.EDIT_SIGN.consumeClick()) {
                     Configs.Generic.SignEdit.setBooleanValue(!Configs.Generic.SignEdit.getBooleanValue());
                     Configs.saveToFile();
-                    Minecraft.getInstance().getChatListener().handleSystemMessage(Component.nullToEmpty("SignEdit set to: " + (Configs.Generic.SignEdit.getBooleanValue() ? "§atrue" : "§cfalse")), true);
+                    Minecraft.getInstance().gui.chatListener().handleSystemMessage(Component.nullToEmpty("SignEdit set to: " + (Configs.Generic.SignEdit.getBooleanValue() ? "§atrue" : "§cfalse")), true);
                 }
             }
 
@@ -219,7 +219,7 @@ public class Events {
             CubesideClientFabric.commands.register(dispatcher);
         });
 
-        LevelRenderEvents.BEFORE_TRANSLUCENT_TERRAIN.register(context -> MiningAssistent.render(context.poseStack()));
+        LevelRenderEvents.BEFORE_TRANSLUCENT_TERRAIN.register(context -> MiningAssistent.render(context.poseStack(), context.submitNodeCollector()));
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             ItemStack itemInHand = player.getItemInHand(hand);
