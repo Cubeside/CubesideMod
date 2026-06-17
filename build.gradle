@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.17.11'
+    id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
     id 'maven-publish'
     id "com.modrinth.minotaur" version "2.9.0"
 }
@@ -42,7 +42,7 @@ dependencies {
 
     compileOnly("maven.modrinth:modmenu:${project.modmenu_version}")
 
-    implementation include("fi.dy.masa.malilib:malilib-fabric-26.2-rc-1:${project.malilib_version}")
+    implementation include("fi.dy.masa.malilib:malilib-fabric-26.2:${project.malilib_version}")
     // implementation include("maven.modrinth:malilib:${project.malilib_version}")
     
     // implementation "de.cubeside.cubesideutils.fabric:CubesideUtilsFabricClient:${project.cubeside_utils_version}"
