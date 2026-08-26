@@ -1,6 +1,6 @@
 package de.fanta.cubeside.util;
 
-import fi.dy.masa.malilib.util.data.Color4f;
+import de.fanta.cubeside.config.option.ArgbColor;
 
 import java.awt.*;
 import java.util.List;
@@ -9,7 +9,7 @@ public class ColorUtils {
     private ColorUtils() {
     }
 
-    public static Color getColorGradient(long time, double speed, List<Color4f> baseColors) {
+    public static Color getColorGradient(long time, double speed, List<ArgbColor> baseColors) {
         int colorCount = baseColors.size();
         int v = Math.floorMod((int) (time * speed * 21), colorCount * 100);
         int step = v / 100;

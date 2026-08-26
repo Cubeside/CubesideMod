@@ -5,13 +5,13 @@ import de.fanta.cubeside.data.ChatDatabase;
 import de.fanta.cubeside.event.CubesideModChannelHandler;
 import de.fanta.cubeside.util.ChatInfo;
 import de.iani.cubesideutils.fabric.scheduler.Scheduler;
-import fi.dy.masa.malilib.util.FileUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +43,7 @@ public class CubesideClientFabric implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        configDirectory = new File(FileUtils.getConfigDirectory() + "/CubesideMod");
+        configDirectory = FabricLoader.getInstance().getConfigDir().resolve("CubesideMod").toFile();
         if (!configDirectory.isDirectory()) {
             configDirectory.mkdirs();
         }

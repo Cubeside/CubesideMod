@@ -1,247 +1,300 @@
 package de.fanta.cubeside.config;
 
-import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import de.fanta.cubeside.CubesideClientFabric;
-import fi.dy.masa.malilib.config.ConfigUtils;
-import fi.dy.masa.malilib.config.IConfigBase;
-import fi.dy.masa.malilib.config.IConfigHandler;
-import fi.dy.masa.malilib.config.options.ConfigBoolean;
-import fi.dy.masa.malilib.config.options.ConfigColor;
-import fi.dy.masa.malilib.config.options.ConfigColorList;
-import fi.dy.masa.malilib.config.options.ConfigDouble;
-import fi.dy.masa.malilib.config.options.ConfigInteger;
-import fi.dy.masa.malilib.config.options.ConfigString;
-import fi.dy.masa.malilib.config.options.ConfigStringList;
-import fi.dy.masa.malilib.util.data.Color4f;
-import java.io.File;
+import de.fanta.cubeside.config.option.ArgbColor;
+import de.fanta.cubeside.config.option.ConfigBoolean;
+import de.fanta.cubeside.config.option.ConfigColor;
+import de.fanta.cubeside.config.option.ConfigColorList;
+import de.fanta.cubeside.config.option.ConfigDouble;
+import de.fanta.cubeside.config.option.ConfigInteger;
+import de.fanta.cubeside.config.option.ConfigString;
+import de.fanta.cubeside.config.option.ConfigStringList;
+import de.fanta.cubeside.config.option.ConfigValue;
 import java.io.IOException;
-import net.minecraft.network.chat.Component;
-import org.apache.commons.io.FileUtils;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
 
-public class Configs implements IConfigHandler {
+public final class Configs {
+    public static final String CONFIG_FILE_NAME = "cubeside.json";
+    public static final int CONFIG_VERSION = 1;
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    private static final String CONFIG_FILE_NAME = "cubeside.json";
-    private static final int CONFIG_VERSION = 1;
-
-    public static class Generic {
-        public static final ConfigBoolean ThirdPersonElytra = new ConfigBoolean("ThirdPersonElytra", false, Component.translatable("options.cubeside.thirdpersonelytra").getString());
-        public static final ConfigBoolean ElytraAlarm = new ConfigBoolean("ElytraAlarm", false, Component.translatable("options.cubeside.elytraalarm").getString());
-        public static final ConfigBoolean ShowInvisibleArmorstands = new ConfigBoolean("ShowInvisibleArmorstands", true, Component.translatable("options.cubeside.showinvisiblearmorstands").getString());
-        public static final ConfigBoolean ShowInvisibleEntitiesInSpectator = new ConfigBoolean("ShowInvisibleEntitiesInSpectator", true, Component.translatable("options.cubeside.showinvisibleentitiesinspectator").getString());
-        public static final ConfigBoolean AFKPling = new ConfigBoolean("AFKPling", false, Component.translatable("options.cubeside.afkpling").getString());
-        public static final ConfigBoolean ClickableTpaMessage = new ConfigBoolean("ClickableTpaMessage", true, Component.translatable("options.cubeside.clickabletpamessage").getString());
-        public static final ConfigBoolean TpaSound = new ConfigBoolean("TpaSound", true, Component.translatable("options.cubeside.tpasound").getString());
-        public static final ConfigBoolean GamemodeSwitcher = new ConfigBoolean("GamemodeSwitcher", true, Component.translatable("options.cubeside.gamemodeswitcher").getString());
-        public static final ConfigBoolean ActionBarShadow = new ConfigBoolean("ActionBarShadow", true, Component.translatable("options.cubeside.actionbarshadow").getString());
-        public static final ConfigBoolean WoodStriping = new ConfigBoolean("WoodStriping", true, Component.translatable("options.cubeside.woodstriping").getString());
-        public static final ConfigBoolean CreateGrassPath = new ConfigBoolean("CreateGrassPath", true, Component.translatable("options.cubeside.creategrasspath").getString());
-        public static final ConfigBoolean SignEdit = new ConfigBoolean("SignEdit", true, Component.translatable("options.cubeside.signedit").getString());
-        public static final ConfigBoolean ShowAdditionalRepairCosts = new ConfigBoolean("ShowAdditionalRepairCosts", false, Component.translatable("options.cubeside.showadditionalrepaircosts").getString());
-        public static final ConfigString FastJoinButtonText = new ConfigString("FastJoinButtonText", "Join Cubeside", Component.translatable("options.cubeside.fastjoinbuttontext").getString());
-        public static final ConfigString FastJoinButtonIP = new ConfigString("FastJoinButtonIP", "cubeside.de", Component.translatable("options.cubeside.fastjoinbuttonip").getString());
-        public static final ConfigInteger FastJoinButtonPort = new ConfigInteger("FastJoinButtonPort", 25565, Component.translatable("options.cubeside.fastjoinbuttonport").getString());
-
-        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                ThirdPersonElytra,
-                ElytraAlarm,
-                ShowInvisibleArmorstands,
-                ShowInvisibleEntitiesInSpectator,
-                AFKPling,
-                ClickableTpaMessage,
-                TpaSound,
-                GamemodeSwitcher,
-                ActionBarShadow,
-                WoodStriping,
-                CreateGrassPath,
-                SignEdit,
-                ShowAdditionalRepairCosts,
-                FastJoinButtonText,
-                FastJoinButtonIP,
-                FastJoinButtonPort);
+    private Configs() {
     }
 
-    public static class Chat {
-        public static final ConfigBoolean ChatTimeStamps = new ConfigBoolean("ChatTimeStamps", false, Component.translatable("options.cubeside.chattimestamps").getString());
-        public static final ConfigColor TimeStampColor = new ConfigColor("TimeStampColor", "#ffffff", Component.translatable("options.cubeside.timestampcolor").getString());
-        public static final ConfigBoolean SaveMessagesToDatabase = new ConfigBoolean("SaveMessagesToDatabase", false, Component.translatable("options.cubeside.savemessagestodatabase").getString());
-        public static final ConfigInteger DaysTheMessagesAreStored = new ConfigInteger("DaysTheMessagesAreStored", 10, 1, 30, true, Component.translatable("options.cubeside.daysthemessagesarestored").getString());
-        public static final ConfigInteger ChatMessageLimit = new ConfigInteger("ChatMessageLimit", 100, 1, 100000, true, Component.translatable("options.cubeside.chatlimit").getString());
-        public static final ConfigBoolean DisplayChatInfo = new ConfigBoolean("DisplayChatInfo", true, Component.translatable("options.cubeside.displaychatinfo").getString());
-        public static final ConfigBoolean CountDuplicateMessages = new ConfigBoolean("CountDuplicateMessages", false, Component.translatable("options.cubeside.countduplicatemessages").getString());
-        public static final ConfigString CountDuplicateMessagesFormat = new ConfigString("CountDuplicateMessagesFormat", " (%sx)", Component.translatable("options.cubeside.countduplicatemessagesformat").getString());
-        public static final ConfigColor CountDuplicateMessagesColor = new ConfigColor("CountDuplicateMessagesColor", "#ffffff", Component.translatable("options.cubeside.countduplicatemessagescolor").getString());
+    public static final class Generic {
+        public static final ConfigBoolean ThirdPersonElytra = bool("ThirdPersonElytra", false, "options.cubeside.thirdpersonelytra");
+        public static final ConfigBoolean ElytraAlarm = bool("ElytraAlarm", false, "options.cubeside.elytraalarm");
+        public static final ConfigBoolean ShowInvisibleArmorstands = bool("ShowInvisibleArmorstands", true, "options.cubeside.showinvisiblearmorstands");
+        public static final ConfigBoolean ShowInvisibleEntitiesInSpectator = bool("ShowInvisibleEntitiesInSpectator", true, "options.cubeside.showinvisibleentitiesinspectator");
+        public static final ConfigBoolean AFKPling = bool("AFKPling", false, "options.cubeside.afkpling");
+        public static final ConfigBoolean ClickableTpaMessage = bool("ClickableTpaMessage", true, "options.cubeside.clickabletpamessage");
+        public static final ConfigBoolean TpaSound = bool("TpaSound", true, "options.cubeside.tpasound");
+        public static final ConfigBoolean GamemodeSwitcher = bool("GamemodeSwitcher", true, "options.cubeside.gamemodeswitcher");
+        public static final ConfigBoolean ActionBarShadow = bool("ActionBarShadow", true, "options.cubeside.actionbarshadow");
+        public static final ConfigBoolean WoodStriping = bool("WoodStriping", true, "options.cubeside.woodstriping");
+        public static final ConfigBoolean CreateGrassPath = bool("CreateGrassPath", true, "options.cubeside.creategrasspath");
+        public static final ConfigBoolean SignEdit = bool("SignEdit", true, "options.cubeside.signedit");
+        public static final ConfigBoolean ShowAdditionalRepairCosts = bool("ShowAdditionalRepairCosts", false, "options.cubeside.showadditionalrepaircosts");
+        public static final ConfigString FastJoinButtonText = string("FastJoinButtonText", "Join Cubeside", "options.cubeside.fastjoinbuttontext");
+        public static final ConfigString FastJoinButtonIP = string("FastJoinButtonIP", "cubeside.de", "options.cubeside.fastjoinbuttonip");
+        public static final ConfigInteger FastJoinButtonPort = integer("FastJoinButtonPort", 25565, "options.cubeside.fastjoinbuttonport");
 
-        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                ChatTimeStamps,
-                TimeStampColor,
-                SaveMessagesToDatabase,
-                DaysTheMessagesAreStored,
-                ChatMessageLimit,
-                DisplayChatInfo,
-                CountDuplicateMessages,
-                CountDuplicateMessagesFormat,
+        public static final List<ConfigValue<?>> OPTIONS = List.of(
+                ThirdPersonElytra, ElytraAlarm, ShowInvisibleArmorstands, ShowInvisibleEntitiesInSpectator,
+                AFKPling, ClickableTpaMessage, TpaSound, GamemodeSwitcher, ActionBarShadow,
+                WoodStriping, CreateGrassPath, SignEdit, ShowAdditionalRepairCosts,
+                FastJoinButtonText, FastJoinButtonIP, FastJoinButtonPort);
+    }
+
+    public static final class Chat {
+        public static final ConfigBoolean ChatTimeStamps = bool("ChatTimeStamps", false, "options.cubeside.chattimestamps");
+        public static final ConfigColor TimeStampColor = color("TimeStampColor", "#ffffff", "options.cubeside.timestampcolor");
+        public static final ConfigBoolean SaveMessagesToDatabase = bool("SaveMessagesToDatabase", false, "options.cubeside.savemessagestodatabase");
+        public static final ConfigInteger DaysTheMessagesAreStored = integer("DaysTheMessagesAreStored", 10, 1, 30, true, "options.cubeside.daysthemessagesarestored");
+        public static final ConfigInteger ChatMessageLimit = integer("ChatMessageLimit", 100, 1, 100000, true, "options.cubeside.chatlimit");
+        public static final ConfigBoolean DisplayChatInfo = bool("DisplayChatInfo", true, "options.cubeside.displaychatinfo");
+        public static final ConfigBoolean CountDuplicateMessages = bool("CountDuplicateMessages", false, "options.cubeside.countduplicatemessages");
+        public static final ConfigString CountDuplicateMessagesFormat = string("CountDuplicateMessagesFormat", " (%sx)", "options.cubeside.countduplicatemessagesformat");
+        public static final ConfigColor CountDuplicateMessagesColor = color("CountDuplicateMessagesColor", "#ffffff", "options.cubeside.countduplicatemessagescolor");
+        public static final List<ConfigValue<?>> OPTIONS = List.of(
+                ChatTimeStamps, TimeStampColor, SaveMessagesToDatabase, DaysTheMessagesAreStored,
+                ChatMessageLimit, DisplayChatInfo, CountDuplicateMessages, CountDuplicateMessagesFormat,
                 CountDuplicateMessagesColor);
     }
 
-    public static class ChunkLoading {
-        public static final ConfigBoolean FullVerticalView = new ConfigBoolean("FullVerticalView", true, Component.translatable("options.cubeside.fullverticalview").getString());
-        public static final ConfigBoolean UnloadChunks = new ConfigBoolean("UnloadChunks", true, Component.translatable("options.cubeside.unloadchunks").getString());
-        public static final ConfigInteger FakeViewDistance = new ConfigInteger("FakeViewDistance", 32, 1, 64, true, Component.translatable("options.cubeside.fakeviewdistance").getString());
-
-        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                FullVerticalView,
-                UnloadChunks,
-                FakeViewDistance);
+    public static final class ChunkLoading {
+        public static final ConfigBoolean FullVerticalView = bool("FullVerticalView", true, "options.cubeside.fullverticalview");
+        public static final ConfigBoolean UnloadChunks = bool("UnloadChunks", true, "options.cubeside.unloadchunks");
+        public static final ConfigInteger FakeViewDistance = integer("FakeViewDistance", 32, 1, 64, true, "options.cubeside.fakeviewdistance");
+        public static final List<ConfigValue<?>> OPTIONS = List.of(FullVerticalView, UnloadChunks, FakeViewDistance);
     }
 
-    public static class Fun {
-        public static final ConfigBoolean DisableChristmasChest = new ConfigBoolean("DisableChristmasChest", false, Component.translatable("options.cubeside.removechristmaschest").getString());
-        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                DisableChristmasChest);
+    public static final class Fun {
+        public static final ConfigBoolean DisableChristmasChest = bool("DisableChristmasChest", false, "options.cubeside.removechristmaschest");
+        public static final List<ConfigValue<?>> OPTIONS = List.of(DisableChristmasChest);
     }
 
-    public static class HitBox {
-        public static final ConfigBoolean ModifiedEntityHitBox = new ConfigBoolean("ModifiedEntityHitBox", false, Component.translatable("options.cubeside.modifiedentityhitbox").getString());
-        public static final ConfigBoolean RainbowEntityHitBox = new ConfigBoolean("RainbowEntityHitBox", false, Component.translatable("options.cubeside.rainbowentityhitbox").getString());
-        public static final ConfigColorList RainbowEntityHitBoxColorList = new ConfigColorList("RainbowEntityHitBoxColorList",
-                ImmutableList.of(Color4f.fromColor(16711684), Color4f.fromColor(16754176), Color4f.fromColor(16769280), Color4f.fromColor(65305), Color4f.fromColor(35071), Color4f.fromColor(13959423)), Component.translatable("options.cubeside.rainbowentityhitboxcolorlist").getString());
-        public static final ConfigDouble RainbowEntityHitBoxSpeed = new ConfigDouble("RainbowEntityHitBoxSpeed", 0.1, 0.0, 1.0, true, Component.translatable("options.cubeside.rainbowentityhitboxspeed").getString());
-        public static final ConfigDouble EntityHitBoxVisibility = new ConfigDouble("EntityHitBoxVisibility", 1, 0.0, 1, true, Component.translatable("options.cubeside.entityhitboxvisibility").getString());
-        public static final ConfigColor EntityHitBoxColor = new ConfigColor("EntityHitBoxColor", "#ffffff", Component.translatable("options.cubeside.entityhitboxcolor").getString());
-        public static final ConfigBoolean EntityHitBoxDirection = new ConfigBoolean("EntityHitBoxDirection", true, Component.translatable("options.cubeside.entityhitboxdirection").getString());
+    public static final class HitBox {
+        public static final ConfigBoolean ModifiedEntityHitBox = bool("ModifiedEntityHitBox", false, "options.cubeside.modifiedentityhitbox");
+        public static final ConfigBoolean RainbowEntityHitBox = bool("RainbowEntityHitBox", false, "options.cubeside.rainbowentityhitbox");
+        public static final ConfigColorList RainbowEntityHitBoxColorList = colorList("RainbowEntityHitBoxColorList", rainbowDefaults(), "options.cubeside.rainbowentityhitboxcolorlist");
+        public static final ConfigDouble RainbowEntityHitBoxSpeed = decimal("RainbowEntityHitBoxSpeed", 0.1, 0.0, 1.0, true, "options.cubeside.rainbowentityhitboxspeed");
+        public static final ConfigDouble EntityHitBoxVisibility = decimal("EntityHitBoxVisibility", 1.0, 0.0, 1.0, true, "options.cubeside.entityhitboxvisibility");
+        public static final ConfigColor EntityHitBoxColor = color("EntityHitBoxColor", "#ffffff", "options.cubeside.entityhitboxcolor");
+        public static final ConfigBoolean EntityHitBoxDirection = bool("EntityHitBoxDirection", true, "options.cubeside.entityhitboxdirection");
+        public static final ConfigBoolean ModifiedBlockHitBox = bool("ModifiedBlockHitBox", false, "options.cubeside.modifiedblockhitbox");
+        public static final ConfigBoolean RainbowBlockHitBox = bool("RainbowBlockHitBox", false, "options.cubeside.rainbowblockhitbox");
+        public static final ConfigColorList RainbowBlockHitBoxColorList = colorList("RainbowBlockHitBoxColorList", rainbowDefaults(), "options.cubeside.rainbowblockhitboxcolorlist");
+        public static final ConfigDouble RainbowBlockHitBoxSpeed = decimal("RainbowBlockHitBoxSpeed", 0.1, 0.0, 1.0, true, "options.cubeside.rainbowblockhitboxspeed");
+        public static final ConfigDouble BlockHitBoxVisibility = decimal("BlockHitBoxVisibility", 0.4, 0.0, 1.0, true, "options.cubeside.blockhitboxvisibility");
+        public static final ConfigColor BlockHitBoxColor = color("BlockHitBoxColor", "#000000", "options.cubeside.blockhitboxcolor");
+        public static final List<ConfigValue<?>> OPTIONS = List.of(
+                ModifiedEntityHitBox, RainbowEntityHitBox, RainbowEntityHitBoxColorList,
+                RainbowEntityHitBoxSpeed, EntityHitBoxColor, EntityHitBoxVisibility, EntityHitBoxDirection,
+                ModifiedBlockHitBox, RainbowBlockHitBox, RainbowBlockHitBoxColorList,
+                RainbowBlockHitBoxSpeed, BlockHitBoxColor, BlockHitBoxVisibility);
 
-        public static final ConfigBoolean ModifiedBlockHitBox = new ConfigBoolean("ModifiedBlockHitBox", false, Component.translatable("options.cubeside.modifiedblockhitbox").getString());
-        public static final ConfigBoolean RainbowBlockHitBox = new ConfigBoolean("RainbowBlockHitBox", false, Component.translatable("options.cubeside.rainbowblockhitbox").getString());
-        public static final ConfigColorList RainbowBlockHitBoxColorList = new ConfigColorList("RainbowBlockHitBoxColorList",
-                ImmutableList.of(Color4f.fromColor(16711684), Color4f.fromColor(16754176), Color4f.fromColor(16769280), Color4f.fromColor(65305), Color4f.fromColor(35071), Color4f.fromColor(13959423)), Component.translatable("options.cubeside.rainbowblockhitboxcolorlist").getString());
-        public static final ConfigDouble RainbowBlockHitBoxSpeed = new ConfigDouble("RainbowBlockHitBoxSpeed", 0.1, 0.0, 1, true, Component.translatable("options.cubeside.rainbowblockhitboxspeed").getString());
-        public static final ConfigDouble BlockHitBoxVisibility = new ConfigDouble("BlockHitBoxVisibility", 0.4, 0.0, 1, true, Component.translatable("options.cubeside.blockhitboxvisibility").getString());
-        public static final ConfigColor BlockHitBoxColor = new ConfigColor("BlockHitBoxColor", "#000000", Component.translatable("options.cubeside.blockhitboxcolor").getString());
-        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                ModifiedEntityHitBox,
-                RainbowEntityHitBox,
-                RainbowEntityHitBoxColorList,
-                RainbowEntityHitBoxSpeed,
-                EntityHitBoxColor,
-                EntityHitBoxVisibility,
-                EntityHitBoxDirection,
-                ModifiedBlockHitBox,
-                RainbowBlockHitBox,
-                RainbowBlockHitBoxColorList,
-                RainbowBlockHitBoxSpeed,
-                BlockHitBoxColor,
-                BlockHitBoxVisibility);
-
-        public static final ConfigBoolean ShowHitBox = new ConfigBoolean("ShowHitBox", false, Component.translatable("options.cubeside.showhitbox").getString());
-        public static final ImmutableList<IConfigBase> INVISIBLE_OPTIONS = ImmutableList.of(
-                ShowHitBox);
+        public static final ConfigBoolean ShowHitBox = bool("ShowHitBox", false, "options.cubeside.showhitbox");
+        public static final List<ConfigValue<?>> INVISIBLE_OPTIONS = List.of(ShowHitBox);
     }
 
-    public static class MiningAssistent {
-        public static final ConfigBoolean MiningAssistentEnabled = new ConfigBoolean("MiningAssistentEnabled", false, Component.translatable("options.cubeside.miningassistentenabled").getString());
-        public static final ConfigInteger MiningAssistentDistance = new ConfigInteger("MiningAssistentDistance", 3, 0, 10, Component.translatable("options.cubeside.miningassistentdistance").getString());
-        public static final ConfigInteger MiningAssistentCircles = new ConfigInteger("MiningAssistentCircles", 16, 1, 30, Component.translatable("options.cubeside.miningassistentcircles").getString());
-        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                MiningAssistentEnabled,
-                MiningAssistentDistance,
-                MiningAssistentCircles);
-
-        public static final ConfigInteger MiningAssistentStartX = new ConfigInteger("MiningAssistentStartX", 0, Component.translatable("options.cubeside.miningassistentstartx").getString());
-        public static final ConfigInteger MiningAssistentStartY = new ConfigInteger("MiningAssistentStartY", 0, Component.translatable("options.cubeside.miningassistentstarty").getString());
-        public static final ConfigInteger MiningAssistentStartZ = new ConfigInteger("MiningAssistentStartZ", 0, Component.translatable("options.cubeside.miningassistentstartz").getString());
-        public static final ImmutableList<IConfigBase> INVISIBLE_OPTIONS = ImmutableList.of(
-                MiningAssistentStartX,
-                MiningAssistentStartY,
-                MiningAssistentStartZ);
+    public static final class MiningAssistent {
+        public static final ConfigBoolean MiningAssistentEnabled = bool("MiningAssistentEnabled", false, "options.cubeside.miningassistentenabled");
+        public static final ConfigInteger MiningAssistentDistance = integer("MiningAssistentDistance", 3, 0, 10, false, "options.cubeside.miningassistentdistance");
+        public static final ConfigInteger MiningAssistentCircles = integer("MiningAssistentCircles", 16, 1, 30, false, "options.cubeside.miningassistentcircles");
+        public static final List<ConfigValue<?>> OPTIONS = List.of(MiningAssistentEnabled, MiningAssistentDistance, MiningAssistentCircles);
+        public static final ConfigInteger MiningAssistentStartX = integer("MiningAssistentStartX", 0, "options.cubeside.miningassistentstartx");
+        public static final ConfigInteger MiningAssistentStartY = integer("MiningAssistentStartY", 0, "options.cubeside.miningassistentstarty");
+        public static final ConfigInteger MiningAssistentStartZ = integer("MiningAssistentStartZ", 0, "options.cubeside.miningassistentstartz");
+        public static final List<ConfigValue<?>> INVISIBLE_OPTIONS = List.of(MiningAssistentStartX, MiningAssistentStartY, MiningAssistentStartZ);
     }
 
-    public static class Fixes {
-        public static final ConfigBoolean SimpleSignGlow = new ConfigBoolean("SimpleSignGlow", false, Component.translatable("options.cubeside.simplesignglow").getString());
-        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                SimpleSignGlow);
+    public static final class Fixes {
+        public static final ConfigBoolean SimpleSignGlow = bool("SimpleSignGlow", false, "options.cubeside.simplesignglow");
+        public static final List<ConfigValue<?>> OPTIONS = List.of(SimpleSignGlow);
     }
 
-    public static class PermissionSettings {
-        public static final ConfigBoolean AutoChat = new ConfigBoolean("AutoChat", false, "AutoChat Enabled");
-        public static final ConfigString AutoChatAntwort = new ConfigString("AutoChatAntwort", "Ich habe grade leider keine Zeit!", "AutoChat Message");
-        public static final ConfigStringList AdminList = new ConfigStringList("AdminList", ImmutableList.of("Eiki", "Brokkonaut", "jonibohni", "_Scorcho", "Starjon", "Becky0810", "Scoptixxx"), "Admin Liste");
+    public static final class PermissionSettings {
+        public static final ConfigBoolean AutoChat = bool("AutoChat", false, "options.cubeside.autochat");
+        public static final ConfigString AutoChatAntwort = string("AutoChatAntwort", "Ich habe grade leider keine Zeit!", "options.cubeside.autochatanswer");
+        public static final ConfigStringList AdminList = stringList("AdminList",
+                List.of("Eiki", "Brokkonaut", "jonibohni", "_Scorcho", "Starjon", "Becky0810", "Scoptixxx"),
+                "options.cubeside.adminlist");
+        public static final List<ConfigValue<?>> OPTIONS = List.of(AutoChat, AutoChatAntwort, AdminList);
+    }
 
-        public static final ImmutableList<IConfigBase> OPTIONS = ImmutableList.of(
-                AutoChat,
-                AutoChatAntwort,
-                AdminList);
+    public record Category(String jsonName, List<ConfigValue<?>> visible, List<ConfigValue<?>> hidden) {
+        public List<ConfigValue<?>> all() {
+            if (hidden.isEmpty()) {
+                return visible;
+            }
+            return java.util.stream.Stream.concat(visible.stream(), hidden.stream()).toList();
+        }
+    }
+
+    private static final List<Category> CATEGORIES = List.of(
+            new Category("Generic", Generic.OPTIONS, List.of()),
+            new Category("Chat", Chat.OPTIONS, List.of()),
+            new Category("ChunkLoading", ChunkLoading.OPTIONS, List.of()),
+            new Category("Fun", Fun.OPTIONS, List.of()),
+            new Category("Hitbox", HitBox.OPTIONS, HitBox.INVISIBLE_OPTIONS),
+            new Category("MiningAssistent", MiningAssistent.OPTIONS, MiningAssistent.INVISIBLE_OPTIONS),
+            new Category("Fixes", Fixes.OPTIONS, List.of()),
+            new Category("PermissionSettings", PermissionSettings.OPTIONS, List.of()));
+
+    public static List<Category> categories() {
+        return CATEGORIES;
     }
 
     public static void loadFromFile() {
-        File oldConfigFile = new File(fi.dy.masa.malilib.util.FileUtils.getConfigDirectory().toFile(), CONFIG_FILE_NAME);
-        File configFile = new File(CubesideClientFabric.getConfigDirectory(), CONFIG_FILE_NAME);
-        if (oldConfigFile.exists()) {
-            try {
-                FileUtils.moveFile(oldConfigFile, configFile);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        Path directory = CubesideClientFabric.getConfigDirectory().toPath();
+        Path legacyFile = directory.getParent().resolve(CONFIG_FILE_NAME);
+        loadFromFile(directory.resolve(CONFIG_FILE_NAME), legacyFile);
+    }
+
+    public static void loadFromFile(Path configFile, Path legacyFile) {
+        resetToDefaults();
+        try {
+            Files.createDirectories(configFile.getParent());
+            if (legacyFile != null && Files.isRegularFile(legacyFile) && Files.notExists(configFile)) {
+                Files.move(legacyFile, configFile);
+                CubesideClientFabric.LOGGER.info("[CubesideMod] Migrated legacy config to {}", configFile);
             }
+            if (Files.notExists(configFile)) {
+                saveToFile(configFile);
+                return;
+            }
+            try (Reader reader = Files.newBufferedReader(configFile, StandardCharsets.UTF_8)) {
+                JsonElement element = JsonParser.parseReader(reader);
+                if (!element.isJsonObject()) {
+                    CubesideClientFabric.LOGGER.warn("[CubesideMod] Ignoring config with non-object root: {}", configFile);
+                    return;
+                }
+                readRoot(element.getAsJsonObject());
+            }
+        } catch (Exception exception) {
+            CubesideClientFabric.LOGGER.error("[CubesideMod] Failed to load config {}", configFile, exception);
         }
+    }
 
-        if (!configFile.exists()) {
-            saveToFile();
-        }
-
-        if (configFile.exists() && configFile.isFile() && configFile.canRead()) {
-            JsonElement element = fi.dy.masa.malilib.util.data.json.JsonUtils.parseJsonFile(configFile.toPath());
-
-            if (element != null && element.isJsonObject()) {
-                JsonObject root = element.getAsJsonObject();
-                ConfigUtils.readConfigBase(root, "Generic", Generic.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Chat", Chat.OPTIONS);
-                ConfigUtils.readConfigBase(root, "ChunkLoading", ChunkLoading.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Fun", Fun.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Hitbox", HitBox.OPTIONS);
-                ConfigUtils.readConfigBase(root, "Hitbox", HitBox.INVISIBLE_OPTIONS);
-                ConfigUtils.readConfigBase(root, "MiningAssistent", MiningAssistent.OPTIONS);
-                ConfigUtils.readConfigBase(root, "MiningAssistent", MiningAssistent.INVISIBLE_OPTIONS);
-                ConfigUtils.readConfigBase(root, "Fixes", Fixes.OPTIONS);
-                ConfigUtils.readConfigBase(root, "PermissionSettings", PermissionSettings.OPTIONS);
+    static void readRoot(JsonObject root) {
+        for (Category category : CATEGORIES) {
+            JsonElement categoryElement = root.get(category.jsonName());
+            if (categoryElement == null || !categoryElement.isJsonObject()) {
+                continue;
+            }
+            JsonObject object = categoryElement.getAsJsonObject();
+            for (ConfigValue<?> option : category.all()) {
+                JsonElement value = object.get(option.getName());
+                if (value == null) {
+                    continue;
+                }
+                try {
+                    option.setValueFromJsonElement(value);
+                } catch (Exception exception) {
+                    option.resetToDefault();
+                    CubesideClientFabric.LOGGER.warn("[CubesideMod] Invalid value for {}.{}; using default", category.jsonName(), option.getName(), exception);
+                }
             }
         }
     }
 
     public static void saveToFile() {
-        File dir = CubesideClientFabric.getConfigDirectory();
+        saveToFile(CubesideClientFabric.getConfigDirectory().toPath().resolve(CONFIG_FILE_NAME));
+    }
 
-        if ((dir.exists() && dir.isDirectory()) || dir.mkdirs()) {
-            JsonObject root = new JsonObject();
-
-            ConfigUtils.writeConfigBase(root, "Generic", Generic.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Chat", Chat.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "ChunkLoading", ChunkLoading.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Fun", Fun.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Hitbox", HitBox.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Hitbox", HitBox.INVISIBLE_OPTIONS);
-            ConfigUtils.writeConfigBase(root, "MiningAssistent", MiningAssistent.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "MiningAssistent", MiningAssistent.INVISIBLE_OPTIONS);
-            ConfigUtils.writeConfigBase(root, "Fixes", Fixes.OPTIONS);
-            ConfigUtils.writeConfigBase(root, "PermissionSettings", PermissionSettings.OPTIONS);
-
-            root.add("config_version", new JsonPrimitive(CONFIG_VERSION));
-
-            fi.dy.masa.malilib.util.data.json.JsonUtils.writeJsonToFile(root, new File(dir, CONFIG_FILE_NAME).toPath());
-
-            CubesideClientFabric.LOGGER.info("[CubesideMod] Config Saved");
+    public static void saveToFile(Path configFile) {
+        Path temporaryFile = null;
+        try {
+            Files.createDirectories(configFile.getParent());
+            temporaryFile = Files.createTempFile(configFile.getParent(), CONFIG_FILE_NAME, ".tmp");
+            try (Writer writer = Files.newBufferedWriter(temporaryFile, StandardCharsets.UTF_8)) {
+                GSON.toJson(createRoot(), writer);
+            }
+            try {
+                Files.move(temporaryFile, configFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException exception) {
+                Files.move(temporaryFile, configFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            temporaryFile = null;
+            CubesideClientFabric.LOGGER.info("[CubesideMod] Config saved");
+        } catch (IOException exception) {
+            CubesideClientFabric.LOGGER.error("[CubesideMod] Failed to save config {}", configFile, exception);
+        } finally {
+            if (temporaryFile != null) {
+                try {
+                    Files.deleteIfExists(temporaryFile);
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
-    @Override
-    public void load() {
-        loadFromFile();
+    static JsonObject createRoot() {
+        JsonObject root = new JsonObject();
+        for (Category category : CATEGORIES) {
+            JsonObject object = new JsonObject();
+            for (ConfigValue<?> option : category.all()) {
+                object.add(option.getName(), option.getAsJsonElement());
+            }
+            root.add(category.jsonName(), object);
+        }
+        root.add("config_version", new JsonPrimitive(CONFIG_VERSION));
+        return root;
     }
 
-    @Override
-    public void save() {
-        saveToFile();
+    public static void resetToDefaults() {
+        CATEGORIES.stream().flatMap(category -> category.all().stream()).forEach(ConfigValue::resetToDefault);
     }
 
+    private static ConfigBoolean bool(String name, boolean defaultValue, String tooltipKey) {
+        return new ConfigBoolean(name, defaultValue, tooltipKey);
+    }
+
+    private static ConfigInteger integer(String name, int defaultValue, String tooltipKey) {
+        return new ConfigInteger(name, defaultValue, tooltipKey);
+    }
+
+    private static ConfigInteger integer(String name, int defaultValue, int min, int max, boolean slider, String tooltipKey) {
+        return new ConfigInteger(name, defaultValue, min, max, slider, tooltipKey);
+    }
+
+    private static ConfigDouble decimal(String name, double defaultValue, double min, double max, boolean slider, String tooltipKey) {
+        return new ConfigDouble(name, defaultValue, min, max, slider, tooltipKey);
+    }
+
+    private static ConfigString string(String name, String defaultValue, String tooltipKey) {
+        return new ConfigString(name, defaultValue, tooltipKey);
+    }
+
+    private static ConfigColor color(String name, String defaultValue, String tooltipKey) {
+        return new ConfigColor(name, defaultValue, tooltipKey);
+    }
+
+    private static ConfigColorList colorList(String name, List<ArgbColor> defaultValue, String tooltipKey) {
+        return new ConfigColorList(name, defaultValue, tooltipKey);
+    }
+
+    private static ConfigStringList stringList(String name, List<String> defaultValue, String tooltipKey) {
+        return new ConfigStringList(name, defaultValue, tooltipKey);
+    }
+
+    private static List<ArgbColor> rainbowDefaults() {
+        return List.of(16711684, 16754176, 16769280, 65305, 35071, 13959423).stream()
+                .map(ArgbColor::fromColor)
+                .toList();
+    }
 }

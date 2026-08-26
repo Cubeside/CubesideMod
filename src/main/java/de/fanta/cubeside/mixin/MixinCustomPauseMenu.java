@@ -3,7 +3,6 @@ package de.fanta.cubeside.mixin;
 import de.fanta.cubeside.CubesideClientFabric;
 import de.fanta.cubeside.config.ConfigGui;
 import de.fanta.cubeside.data.SearchScreen;
-import fi.dy.masa.malilib.gui.GuiBase;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -23,7 +22,7 @@ public abstract class MixinCustomPauseMenu extends Screen {
 
     @Inject(at = @At("TAIL"), method = "createPauseMenu")
     private void addCustomButton(CallbackInfo ci) {
-        this.addRenderableWidget(Button.builder(Component.translatable("custombutton.cubeside.options"), _ -> GuiBase.openGui(new ConfigGui())).bounds(this.width / 2 - 100 + 205, this.height / 4 + 72 - 15, 100, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("custombutton.cubeside.options"), _ -> minecraft.setScreenAndShow(new ConfigGui(this))).bounds(this.width / 2 - 100 + 205, this.height / 4 + 72 - 15, 100, 20).build());
         if (CubesideClientFabric.getChatDatabase() != null) {
             if (minecraft == null) {
                 return;

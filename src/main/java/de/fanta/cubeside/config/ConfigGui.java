@@ -1,136 +1,135 @@
 package de.fanta.cubeside.config;
 
-import com.google.common.collect.ImmutableList;
-import de.fanta.cubeside.CubesideClientFabric;
-import fi.dy.masa.malilib.config.IConfigBase;
-import fi.dy.masa.malilib.gui.GuiConfigsBase;
-import fi.dy.masa.malilib.gui.button.ButtonBase;
-import fi.dy.masa.malilib.gui.button.ButtonGeneric;
-import fi.dy.masa.malilib.gui.button.IButtonActionListener;
-import fi.dy.masa.malilib.util.StringUtils;
-import java.util.Collections;
+import de.fanta.cubeside.config.gui.CategoryListWidget;
+import de.fanta.cubeside.config.gui.ColorEditorScreen;
+import de.fanta.cubeside.config.gui.ColorListEditorScreen;
+import de.fanta.cubeside.config.gui.CubesideSettings;
+import de.fanta.cubeside.config.gui.SettingsCategory;
+import de.fanta.cubeside.config.gui.SettingsListWidget;
+import de.fanta.cubeside.config.gui.StringListEditorScreen;
+import de.fanta.cubeside.config.option.ConfigColor;
+import de.fanta.cubeside.config.option.ConfigColorList;
+import de.fanta.cubeside.config.option.ConfigStringList;
+import de.fanta.cubeside.config.option.ConfigValue;
 import java.util.List;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
-public class ConfigGui extends GuiConfigsBase { // GuiBase.openGui(new ConfigGui()); <-- Open GUI
-    private static ConfigGuiTab tab = ConfigGuiTab.GENERIC;
+public final class ConfigGui extends Screen {
+    private static final int HEADER_HEIGHT = 32;
+    private static final int FOOTER_HEIGHT = 32;
+    private static final int CATEGORY_GAP = 4;
 
-    public ConfigGui() {
-        super(10, 50, CubesideClientFabric.MODID, null, "cubeside.gui.title.configs");
+    private final Screen parent;
+    private final List<SettingsCategory> categories = CubesideSettings.create();
+    private int selectedCategory;
+    private int contentX;
+    private int contentY;
+    private int contentWidth;
+    private int contentHeight;
+    private int categoryWidth;
+    private CategoryListWidget categoryList;
+    private SettingsListWidget optionList;
+
+    public ConfigGui(Screen parent) {
+        super(Component.translatable("cubeside.gui.title.configs"));
+        this.parent = parent;
     }
 
     @Override
-    public void initGui() {
-        super.initGui();
-        this.clearOptions();
+    protected void init() {
+        if (optionList != null) {
+            optionList.commitPendingText();
+        }
+        clearWidgets();
+        categoryList = null;
+        optionList = null;
+        contentWidth = Math.max(180, Math.min(width - 16, 760));
+        contentHeight = Math.max(80, height - HEADER_HEIGHT - FOOTER_HEIGHT);
+        contentX = (width - contentWidth) / 2;
+        contentY = HEADER_HEIGHT;
+        categoryWidth = Math.clamp(contentWidth / 5, 96, 138);
 
-        int x = 10;
-        int y = 26;
+        categoryList = new CategoryListWidget(this, contentX, contentY, categoryWidth, contentHeight, categories);
+        addRenderableWidget(categoryList);
+        rebuildOptions();
 
-        for (ConfigGuiTab tab : ConfigGuiTab.VALUES) {
-            x += this.createButton(x, y, -1, tab);
+        addRenderableWidget(Button.builder(Component.translatable("gui.done"), ignored -> onClose())
+                .bounds(width / 2 - 100, height - 27, 200, 20).build());
+    }
+
+    public int selectedCategory() {
+        return selectedCategory;
+    }
+
+    public void selectCategory(int index) {
+        if (index == selectedCategory) {
+            return;
+        }
+        if (optionList != null) {
+            optionList.commitPendingText();
+        }
+        selectedCategory = index;
+        rebuildOptions();
+    }
+
+    private void rebuildOptions() {
+        if (optionList != null) {
+            removeWidget(optionList);
+        }
+        int listX = contentX + categoryWidth + CATEGORY_GAP;
+        int listWidth = contentWidth - categoryWidth - CATEGORY_GAP;
+        optionList = new SettingsListWidget(this, listX, contentY, listWidth, contentHeight, categories.get(selectedCategory));
+        addRenderableWidget(optionList);
+    }
+
+    public void openEditor(ConfigValue<?> option) {
+        if (optionList != null) {
+            optionList.commitPendingText();
+        }
+        if (option instanceof ConfigColor color) {
+            minecraft.setScreenAndShow(new ColorEditorScreen(this, color.getDisplayName(), color.getColor(), color.getDefaultValue(), color::setIntegerValue));
+        } else if (option instanceof ConfigColorList colors) {
+            minecraft.setScreenAndShow(new ColorListEditorScreen(this, colors));
+        } else if (option instanceof ConfigStringList strings) {
+            minecraft.setScreenAndShow(new StringListEditorScreen(this, strings));
         }
     }
 
-    private int createButton(int x, int y, int width, ConfigGuiTab tab) {
-        ButtonGeneric button = new ButtonGeneric(x, y, width, 20, tab.getDisplayName());
-        button.setEnabled(ConfigGui.tab != tab);
-        this.addButton(button, new ButtonListener(tab, this));
-
-        return button.getWidth() + 2;
-    }
-
     @Override
-    protected int getConfigWidth() {
-        /*
-         * ConfigGuiTab tab = ConfigGui.tab;
-         * if (tab == ConfigGuiTab.GENERIC || tab == ConfigGuiTab.CHUNKLOADING) {
-         * return 100;
-         * }
-         */
-
-        return super.getConfigWidth();
-    }
-
-    @Override
-    public List<ConfigOptionWrapper> getConfigs() {
-        List<? extends IConfigBase> configs;
-        ConfigGuiTab tab = ConfigGui.tab;
-
-        if (tab == ConfigGuiTab.GENERIC) {
-            configs = Configs.Generic.OPTIONS;
-        } else if (tab == ConfigGuiTab.CHAT) {
-            configs = Configs.Chat.OPTIONS;
-        } else if (tab == ConfigGuiTab.CHUNKLOADING) {
-            configs = Configs.ChunkLoading.OPTIONS;
-        } else if (tab == ConfigGuiTab.FUN) {
-            configs = Configs.Fun.OPTIONS;
-        } else if (tab == ConfigGuiTab.HITBOX) {
-            configs = Configs.HitBox.OPTIONS;
-        } else if (tab == ConfigGuiTab.MININGASSISTENT) {
-            configs = Configs.MiningAssistent.OPTIONS;
-        } else if (tab == ConfigGuiTab.FIXES) {
-            configs = Configs.Fixes.OPTIONS;
-        } else if (tab == ConfigGuiTab.PERMISSIONSETTINGS) {
-            configs = Configs.PermissionSettings.OPTIONS;
-        } else {
-            return Collections.emptyList();
+    public void onClose() {
+        if (optionList != null) {
+            optionList.commitPendingText();
         }
-
-        return ConfigOptionWrapper.createFor(configs);
+        minecraft.setScreenAndShow(parent);
     }
 
     @Override
     public void removed() {
-        if (this.getListWidget().wereConfigsModified()) {
-            this.getListWidget().applyPendingModifications();
-            this.onSettingsChanged();
-            this.getListWidget().clearConfigsModifiedFlag();
-            Configs.saveToFile();
+        if (optionList != null) {
+            optionList.commitPendingText();
         }
-
         Configs.saveToFile();
-        // this.client.keyboard.setRepeatEvents(false);
     }
 
-    private static class ButtonListener implements IButtonActionListener {
-        private final ConfigGui parent;
-        private final ConfigGuiTab tab;
-
-        public ButtonListener(ConfigGuiTab tab, ConfigGui parent) {
-            this.tab = tab;
-            this.parent = parent;
-        }
-
-        @Override
-        public void actionPerformedWithButton(ButtonBase button, int mouseButton) {
-            ConfigGui.tab = this.tab;
-
-            this.parent.reCreateListWidget(); // apply the new config width
-            this.parent.getListWidget().resetScrollbarPosition();
-            this.parent.initGui();
-        }
+    @Override
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        graphics.centeredText(getFont(), title, width / 2, 12, 0xFFFFFFFF);
     }
 
-    public enum ConfigGuiTab {
-        GENERIC("cubeside.gui.button.config_gui.generic"),
-        CHAT("cubeside.gui.button.config_gui.chat"),
-        CHUNKLOADING("cubeside.gui.button.config_gui.chunkloading"),
-        FUN("cubeside.gui.button.config_gui.fun"),
-        HITBOX("cubeside.gui.button.config_gui.hitbox"),
-        MININGASSISTENT("cubeside.gui.button.config_gui.miningassistent"),
-        FIXES("cubeside.gui.button.config_gui.fixes"),
-        PERMISSIONSETTINGS("cubeside.gui.button.config_gui.permissionsettings");
+    @Override
+    public void extractMenuBackground(GuiGraphicsExtractor graphics) {
+        super.extractMenuBackground(graphics);
+        graphics.fill(contentX - 4, contentY - 4, contentX + contentWidth + 4, contentY + contentHeight + 4, 0x66000000);
+        graphics.fill(contentX + categoryWidth + 1, contentY, contentX + categoryWidth + 2, contentY + contentHeight, 0x88707070);
+    }
 
-        private final String translationKey;
-
-        public static final ImmutableList<ConfigGuiTab> VALUES = ImmutableList.copyOf(values());
-
-        ConfigGuiTab(String translationKey) {
-            this.translationKey = translationKey;
-        }
-
-        public String getDisplayName() {
-            return StringUtils.translate(this.translationKey);
-        }
+    @Override
+    public Font getFont() {
+        return super.getFont();
     }
 }

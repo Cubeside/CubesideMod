@@ -2,8 +2,8 @@ package de.fanta.cubeside.mixin;
 
 import de.fanta.cubeside.CubesideClientFabric;
 import de.fanta.cubeside.config.Configs;
+import de.fanta.cubeside.config.option.ArgbColor;
 import de.fanta.cubeside.util.ColorUtils;
-import fi.dy.masa.malilib.util.data.Color4f;
 import java.awt.Color;
 import java.util.List;
 import net.minecraft.client.renderer.debug.EntityHitboxDebugRenderer;
@@ -21,7 +21,7 @@ public abstract class MixinCustomHitBox {
         if (!Configs.HitBox.RainbowEntityHitBox.getBooleanValue()) {
             return Configs.HitBox.EntityHitBoxColor.getColor().toVanillaArgb() | 0xff000000;
         }
-        List<Color4f> color4fList = Configs.HitBox.RainbowEntityHitBoxColorList.getColors();
+        List<ArgbColor> color4fList = Configs.HitBox.RainbowEntityHitBoxColorList.getColors();
         if (color4fList.isEmpty()) {
             color4fList = Configs.HitBox.RainbowEntityHitBoxColorList.getDefaultColors();
         }

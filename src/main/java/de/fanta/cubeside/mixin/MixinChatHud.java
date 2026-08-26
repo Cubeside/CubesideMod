@@ -120,7 +120,7 @@ public abstract class MixinChatHud implements ChatHudMethods {
 
                 MutableComponent text = lastMessage.copy();
                 MutableComponent countText = Component.literal(String.format(Configs.Chat.CountDuplicateMessagesFormat.getStringValue(), count));
-                countText.setStyle(Style.EMPTY.withColor(TextColor.parseColor(Configs.Chat.CountDuplicateMessagesColor.getColor().toHexString()).result().get()));
+                countText.setStyle(Style.EMPTY.withColor(TextColor.fromRgb(Configs.Chat.CountDuplicateMessagesColor.getColor().toVanillaRgb())));
                 text.append(countText);
                 componentIn = text;
 

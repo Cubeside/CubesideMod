@@ -27,7 +27,6 @@ repositories {
     // }
     // maven {url "https://minecraft.guntram.de/maven/"}
     maven { url = "https://plugins.gradle.org/m2/" }
-    maven { url 'https://maven.fallenbreath.me/releases' } // conditional-mixin for malilib
     mavenCentral()
     mavenLocal()
 }
@@ -42,14 +41,14 @@ dependencies {
 
     compileOnly("maven.modrinth:modmenu:${project.modmenu_version}")
 
-    implementation include("fi.dy.masa.malilib:malilib-fabric-26.2:${project.malilib_version}")
-    // implementation include("maven.modrinth:malilib:${project.malilib_version}")
-    
     // implementation "de.cubeside.cubesideutils.fabric:CubesideUtilsFabricClient:${project.cubeside_utils_version}"
     implementation "maven.modrinth:cubesideutilsfabricclient:${project.cubeside_utils_version}"
 
     // implementation "net.caffeinemc:sodium-fabric:0.8.7-SNAPSHOT+mc26.1-rc-3-local"
     implementation "maven.modrinth:sodium:${project.sodium_version}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.3"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
@@ -133,4 +132,12 @@ modrinth {
 
 boolean isMCVersionNonRelease() {
     return project.minecraft_version.matches('^\\d\\dw\\d\\d[a-z]$') || project.minecraft_version.matches('\\d+\\.\\d+-(pre|rc)-\\d+')
+}
+
+tasks.test {
+    useJUnitPlatform()
+    workingDir = layout.buildDirectory.dir("test-run").get().asFile
+    doFirst {
+        getWorkingDir().mkdirs()
+    }
 }
