@@ -1,14 +1,24 @@
 package de.fanta.cubeside.config.gui;
 
 import de.fanta.cubeside.config.Configs;
+import de.iani.cubesideutils.fabric.permission.PermissionHandler;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public final class CubesideSettings {
+    private static final String AUTO_CHAT_PERMISSION = "cubeside.autochat";
+    private static final String AFK_CHECK_PERMISSION = "cubeside.afkcheck";
+
     private CubesideSettings() {
     }
 
     public static List<SettingsCategory> create() {
-        return List.of(
+        return create(PermissionHandler::hasPermission);
+    }
+
+    static List<SettingsCategory> create(Predicate<String> hasPermission) {
+        List<SettingsCategory> categories = new ArrayList<>(List.of(
                 new SettingsCategory("generic", "cubeside.gui.button.config_gui.generic", List.of(
                         group("cubeside.settings.group.gameplay",
                                 Configs.Generic.ThirdPersonElytra, Configs.Generic.ElytraAlarm,
@@ -45,10 +55,21 @@ public final class CubesideSettings {
                                 Configs.HitBox.RainbowBlockHitBoxColorList, Configs.HitBox.RainbowBlockHitBoxSpeed,
                                 Configs.HitBox.BlockHitBoxColor, Configs.HitBox.BlockHitBoxVisibility))),
                 new SettingsCategory("miningassistent", "cubeside.gui.button.config_gui.miningassistent", List.of(
-                        group("cubeside.settings.group.mining", Configs.MiningAssistent.OPTIONS))),
-                new SettingsCategory("permissionsettings", "cubeside.gui.button.config_gui.permissionsettings", List.of(
-                        group("cubeside.settings.group.autoChat", Configs.PermissionSettings.AutoChat, Configs.PermissionSettings.AutoChatAntwort),
-                        group("cubeside.settings.group.admins", Configs.PermissionSettings.AdminList))));
+                        group("cubeside.settings.group.mining", Configs.MiningAssistent.OPTIONS)))));
+
+        List<SettingsGroup> permissionGroups = new ArrayList<>();
+        if (hasPermission.test(AUTO_CHAT_PERMISSION)) {
+            permissionGroups.add(group("cubeside.settings.group.autoChat",
+                    Configs.PermissionSettings.AutoChat, Configs.PermissionSettings.AutoChatAntwort));
+        }
+        if (hasPermission.test(AFK_CHECK_PERMISSION)) {
+            permissionGroups.add(group("cubeside.settings.group.admins", Configs.PermissionSettings.AdminList));
+        }
+        if (!permissionGroups.isEmpty()) {
+            categories.add(new SettingsCategory("permissionsettings",
+                    "cubeside.gui.button.config_gui.permissionsettings", permissionGroups));
+        }
+        return List.copyOf(categories);
     }
 
     private static SettingsGroup group(String titleKey, de.fanta.cubeside.config.option.ConfigValue<?>... values) {
