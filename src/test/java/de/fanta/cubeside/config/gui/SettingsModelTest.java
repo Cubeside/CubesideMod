@@ -52,6 +52,17 @@ class SettingsModelTest {
         }
     }
 
+    @Test
+    void miningAssistantUsesTheConfiguredSliderRanges() {
+        assertTrue(Configs.MiningAssistent.MiningAssistentDistance.shouldUseSlider());
+        assertEquals(1, Configs.MiningAssistent.MiningAssistentDistance.getMinIntegerValue());
+        assertEquals(100, Configs.MiningAssistent.MiningAssistentDistance.getMaxIntegerValue());
+
+        assertTrue(Configs.MiningAssistent.MiningAssistentCircles.shouldUseSlider());
+        assertEquals(1, Configs.MiningAssistent.MiningAssistentCircles.getMinIntegerValue());
+        assertEquals(50, Configs.MiningAssistent.MiningAssistentCircles.getMaxIntegerValue());
+    }
+
     private static JsonObject load(String language) {
         String path = "/assets/cubeside/lang/" + language + ".json";
         return JsonParser.parseReader(new InputStreamReader(

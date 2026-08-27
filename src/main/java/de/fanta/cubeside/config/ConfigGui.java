@@ -1,8 +1,7 @@
 package de.fanta.cubeside.config;
 
 import de.fanta.cubeside.config.gui.CategoryListWidget;
-import de.fanta.cubeside.config.gui.ColorEditorScreen;
-import de.fanta.cubeside.config.gui.ColorListEditorScreen;
+import de.fanta.cubeside.config.gui.ColorPickerDialog;
 import de.fanta.cubeside.config.gui.CubesideSettings;
 import de.fanta.cubeside.config.gui.SettingsCategory;
 import de.fanta.cubeside.config.gui.SettingsListWidget;
@@ -16,6 +15,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 public final class ConfigGui extends Screen {
@@ -33,6 +33,8 @@ public final class ConfigGui extends Screen {
     private int categoryWidth;
     private CategoryListWidget categoryList;
     private SettingsListWidget optionList;
+    private Button doneButton;
+    private ColorPickerDialog colorPickerDialog;
 
     public ConfigGui(Screen parent) {
         super(Component.translatable("cubeside.gui.title.configs"));
@@ -57,8 +59,15 @@ public final class ConfigGui extends Screen {
         addRenderableWidget(categoryList);
         rebuildOptions();
 
-        addRenderableWidget(Button.builder(Component.translatable("gui.done"), ignored -> onClose())
+        doneButton = addRenderableWidget(Button.builder(Component.translatable("gui.done"), ignored -> onClose())
                 .bounds(width / 2 - 100, height - 27, 200, 20).build());
+
+        if (colorPickerDialog != null) {
+            colorPickerDialog.setScreenSize(width, height);
+            setBackgroundActive(false);
+            addRenderableWidget(colorPickerDialog);
+            setInitialFocus(colorPickerDialog);
+        }
     }
 
     public int selectedCategory() {
@@ -87,20 +96,90 @@ public final class ConfigGui extends Screen {
     }
 
     public void openEditor(ConfigValue<?> option) {
+        if (colorPickerDialog != null) {
+            return;
+        }
         if (optionList != null) {
             optionList.commitPendingText();
         }
         if (option instanceof ConfigColor color) {
-            minecraft.setScreenAndShow(new ColorEditorScreen(this, color.getDisplayName(), color.getColor(), color.getDefaultValue(), color::setIntegerValue));
+            showColorPicker(ColorPickerDialog.forSingle(width, height, getFont(), color.getDisplayName(),
+                    color.getColor(), color.getDefaultValue(), color::setIntegerValue, this::closeColorPicker));
         } else if (option instanceof ConfigColorList colors) {
-            minecraft.setScreenAndShow(new ColorListEditorScreen(this, colors));
+            showColorPicker(ColorPickerDialog.forList(width, height, getFont(), colors.getDisplayName(),
+                    colors.getColors(), colors.getDefaultColors(), colors::setColors, this::closeColorPicker));
         } else if (option instanceof ConfigStringList strings) {
             minecraft.setScreenAndShow(new StringListEditorScreen(this, strings));
         }
     }
 
+    private void showColorPicker(ColorPickerDialog dialog) {
+        colorPickerDialog = dialog;
+        setBackgroundActive(false);
+        addRenderableWidget(dialog);
+        setInitialFocus(dialog);
+    }
+
+    private void closeColorPicker() {
+        if (colorPickerDialog == null) {
+            return;
+        }
+        removeWidget(colorPickerDialog);
+        colorPickerDialog = null;
+        clearFocus();
+        setBackgroundActive(true);
+    }
+
+    private void setBackgroundActive(boolean active) {
+        if (categoryList != null) {
+            categoryList.active = active;
+        }
+        if (optionList != null) {
+            optionList.active = active;
+        }
+        if (doneButton != null) {
+            doneButton.active = active;
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (colorPickerDialog != null) {
+            return colorPickerDialog.mouseClicked(event, doubleClick);
+        }
+        return super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        if (colorPickerDialog != null) {
+            return colorPickerDialog.mouseReleased(event);
+        }
+        return super.mouseReleased(event);
+    }
+
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        if (colorPickerDialog != null) {
+            return colorPickerDialog.mouseDragged(event, dragX, dragY);
+        }
+        return super.mouseDragged(event, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (colorPickerDialog != null) {
+            return colorPickerDialog.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
+
     @Override
     public void onClose() {
+        if (colorPickerDialog != null) {
+            closeColorPicker();
+            return;
+        }
         if (optionList != null) {
             optionList.commitPendingText();
         }
@@ -109,6 +188,7 @@ public final class ConfigGui extends Screen {
 
     @Override
     public void removed() {
+        colorPickerDialog = null;
         if (optionList != null) {
             optionList.commitPendingText();
         }
@@ -118,7 +198,9 @@ public final class ConfigGui extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         super.extractRenderState(graphics, mouseX, mouseY, delta);
-        graphics.centeredText(getFont(), title, width / 2, 12, 0xFFFFFFFF);
+        if (colorPickerDialog == null) {
+            graphics.centeredText(getFont(), title, width / 2, 12, 0xFFFFFFFF);
+        }
     }
 
     @Override

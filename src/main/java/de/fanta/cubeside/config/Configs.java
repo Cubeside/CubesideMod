@@ -113,8 +113,8 @@ public final class Configs {
 
     public static final class MiningAssistent {
         public static final ConfigBoolean MiningAssistentEnabled = bool("MiningAssistentEnabled", false, "options.cubeside.miningassistentenabled");
-        public static final ConfigInteger MiningAssistentDistance = integer("MiningAssistentDistance", 3, 0, 10, false, "options.cubeside.miningassistentdistance");
-        public static final ConfigInteger MiningAssistentCircles = integer("MiningAssistentCircles", 16, 1, 30, false, "options.cubeside.miningassistentcircles");
+        public static final ConfigInteger MiningAssistentDistance = integer("MiningAssistentDistance", 3, 1, 100, true, "options.cubeside.miningassistentdistance");
+        public static final ConfigInteger MiningAssistentCircles = integer("MiningAssistentCircles", 16, 1, 50, true, "options.cubeside.miningassistentcircles");
         public static final List<ConfigValue<?>> OPTIONS = List.of(MiningAssistentEnabled, MiningAssistentDistance, MiningAssistentCircles);
         public static final ConfigInteger MiningAssistentStartX = integer("MiningAssistentStartX", 0, "options.cubeside.miningassistentstartx");
         public static final ConfigInteger MiningAssistentStartY = integer("MiningAssistentStartY", 0, "options.cubeside.miningassistentstarty");

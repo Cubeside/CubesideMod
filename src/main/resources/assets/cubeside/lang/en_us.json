@@ -57,12 +57,12 @@
     "cubeside.gui.button.config_gui.permissionsettings": "Permission Settings",
     "options.debugscreen": "Debug Screen",
 
-    "cubeside.gui.button.config_gui.miningassistent": "Mining Assistent",
-    "options.cubeside.miningassistentenabled": "Mining Assistent Enabled",
-    "options.cubeside.miningassistentdistance": "Mining Assistent Distance",
-    "options.cubeside.miningassistentcircles": "Mining Assistent Circles",
-    "key.cubeside.miningassistant": "Toggle Mining Assistent",
-    "key.cubeside.setminingassistantstartpoint": "Mining Assistent Startpoint",
+    "cubeside.gui.button.config_gui.miningassistent": "Mining Assistant",
+    "options.cubeside.miningassistentenabled": "Enable the mining assistant",
+    "options.cubeside.miningassistentdistance": "Mining assistant distance",
+    "options.cubeside.miningassistentcircles": "Mining assistant circles",
+    "key.cubeside.miningassistant": "Toggle mining assistant",
+    "key.cubeside.setminingassistantstartpoint": "Set mining assistant start point",
     "key.cubeside.woodstriping": "Toggle Wood Striping",
     "key.cubeside.creategrasspath": "Toggle Create Grass Path",
     "key.cubeside.editsign": "Toggle Sign Edit",
@@ -151,6 +151,9 @@
     "cubeside.settings.noEntries": "No entries",
     "cubeside.settings.apply": "Apply",
     "cubeside.settings.color.hex": "RGB hex",
+    "cubeside.settings.color.invalid": "Invalid hex value",
+    "cubeside.settings.color.add": "Add color",
+    "cubeside.settings.color.list": "Color list",
     "cubeside.settings.list.add": "Add entry",
     "cubeside.settings.list.empty": "The list is empty"
 }

@@ -55,12 +55,12 @@
     "cubeside.gui.button.config_gui.permissionsettings": "Erlaubnis-Einstellungen",
     "options.debugscreen": "Debug Bildschirm",
 
-    "cubeside.gui.button.config_gui.miningassistent": "Mining Assistent",
-    "options.cubeside.miningassistentenabled": "Mining Assistent Aktiv",
-    "options.cubeside.miningassistentdistance": "Mining Assistent entfernung",
-    "options.cubeside.miningassistentcircles": "Mining Assistent runden",
-    "key.cubeside.miningassistant": "Mining Assistent umschalten",
-    "key.cubeside.setminingassistantstartpoint": "Mining Assistent Startpunkt",
+    "cubeside.gui.button.config_gui.miningassistent": "Mining-Assistent",
+    "options.cubeside.miningassistentenabled": "Mining-Assistent aktivieren",
+    "options.cubeside.miningassistentdistance": "Entfernung des Mining-Assistenten",
+    "options.cubeside.miningassistentcircles": "Runden des Mining-Assistenten",
+    "key.cubeside.miningassistant": "Mining-Assistent umschalten",
+    "key.cubeside.setminingassistantstartpoint": "Startpunkt des Mining-Assistenten setzen",
 
     "cubeside.additional_repair_costs": "Zusätzliche Reparaturkosten",
     "options.cubeside.modifiedentityhitbox": "Aktiviert eine angepasste Entitäten-Hitbox",
@@ -147,6 +147,9 @@
     "cubeside.settings.noEntries": "Keine Einträge",
     "cubeside.settings.apply": "Anwenden",
     "cubeside.settings.color.hex": "RGB-Hexwert",
+    "cubeside.settings.color.invalid": "Ungültiger Hexwert",
+    "cubeside.settings.color.add": "Farbe hinzufügen",
+    "cubeside.settings.color.list": "Farbliste",
     "cubeside.settings.list.add": "Eintrag hinzufügen",
     "cubeside.settings.list.empty": "Die Liste ist leer"
 }
