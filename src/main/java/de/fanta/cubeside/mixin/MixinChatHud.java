@@ -4,6 +4,8 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
 import de.fanta.cubeside.ChatInfoHud;
 import de.fanta.cubeside.CubesideClientFabric;
+import de.fanta.cubeside.chat.DuplicateMessageFormatter;
+import de.fanta.cubeside.chat.DuplicateMessageTracker;
 import de.fanta.cubeside.config.Configs;
 import de.fanta.cubeside.data.ChatDatabase;
 import de.fanta.cubeside.util.ChatHudMethods;
@@ -16,7 +18,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.gui.components.ComponentRenderUtils;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
@@ -24,6 +25,7 @@ import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.chat.MessageSignature;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
@@ -31,8 +33,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.Final;
@@ -44,17 +44,24 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(ChatComponent.class)
 public abstract class MixinChatHud implements ChatHudMethods {
     @Unique
     private static final Date DATE = new Date();
     @Unique
-    private Component lastMessage;
+    private final DuplicateMessageTracker duplicateMessageTracker = new DuplicateMessageTracker();
     @Unique
-    private Component lastEditMessage;
+    private Component pendingOriginalMessage;
     @Unique
-    private int count = 1;
+    private GuiMessage pendingVisibleMessage;
+    @Unique
+    private DuplicateMessageTracker.Decision pendingDuplicateDecision;
+    @Unique
+    private boolean pendingAggregationEnabled;
+    @Unique
+    private static boolean invalidDuplicateFormatWarningLogged;
     @Unique
     private static ChatInfoHud chatInfoHud;
     @Final
@@ -69,10 +76,22 @@ public abstract class MixinChatHud implements ChatHudMethods {
     }
 
     @Redirect(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;logChatMessage(Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V"))
-    private void addMessage(ChatComponent instance, GuiMessage message) {
-        if (!CubesideClientFabric.isLoadingMessages()) {
-            logChatMessage(message);
+    private void prepareVisibleMessage(ChatComponent instance, GuiMessage message) {
+        Component originalMessage = pendingOriginalMessage != null ? pendingOriginalMessage : message.content();
+        DuplicateMessageTracker.Key key = new DuplicateMessageTracker.Key(originalMessage.copy(), message.source(), message.tag());
+        DuplicateMessageTracker.Decision decision;
+        pendingAggregationEnabled = Configs.Chat.CountDuplicateMessages.getBooleanValue();
+        if (pendingAggregationEnabled) {
+            decision = duplicateMessageTracker.prepareVisible(key, allMessages, trimmedMessages);
+        } else {
+            duplicateMessageTracker.reset();
+            decision = new DuplicateMessageTracker.Decision(key, 1, false, false, 0);
         }
+
+        GuiMessage visibleMessage = decision.duplicate() ? withDuplicateCount(message, decision.count()) : message;
+        pendingDuplicateDecision = decision;
+        pendingVisibleMessage = visibleMessage;
+        logChatMessage(visibleMessage);
     }
 
     @Shadow
@@ -86,17 +105,17 @@ public abstract class MixinChatHud implements ChatHudMethods {
     public List<GuiMessage.Line> trimmedMessages;
 
     @Shadow
-    public abstract int getWidth();
-
-    @Shadow
-    public abstract double getScale();
-
-    @Shadow
     @Final
     public List<GuiMessage> allMessages;
 
+    @Invoker("addMessageToDisplayQueue")
+    protected abstract void cubesideMod$invokeAddMessageToDisplayQueue(GuiMessage message);
+
+    @Invoker("addMessageToQueue")
+    protected abstract void cubesideMod$invokeAddMessageToQueue(GuiMessage message);
+
     @Shadow
-    public abstract void addMessageToDisplayQueue(GuiMessage message);
+    public abstract void scrollChat(int amount);
 
     @Inject(method = "extractRenderState", at = @At(value = "RETURN"))
     private void renderChatHudInfo(GuiGraphicsExtractor context, Font font, int currentTick, int mouseX, int mouseY, ChatComponent.DisplayMode displayMode, boolean changeCursorOnInsertions, CallbackInfo ci) {
@@ -109,45 +128,12 @@ public abstract class MixinChatHud implements ChatHudMethods {
     @ModifyVariable(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At("HEAD"), argsOnly = true)
     private Component modifyMessages(Component componentIn) {
         if (CubesideClientFabric.isLoadingMessages()) {
-            CubesideClientFabric.messageQueue.add(componentIn);
-            return Component.empty();
+            return componentIn;
         }
 
-        if (Configs.Chat.CountDuplicateMessages.getBooleanValue()) {
-            if (lastMessage != null && lastMessage.equals(componentIn)) {
-                count++;
-                lastMessage = componentIn;
-
-                MutableComponent text = lastMessage.copy();
-                MutableComponent countText = Component.literal(String.format(Configs.Chat.CountDuplicateMessagesFormat.getStringValue(), count));
-                countText.setStyle(Style.EMPTY.withColor(TextColor.fromRgb(Configs.Chat.CountDuplicateMessagesColor.getColor().toVanillaRgb())));
-                text.append(countText);
-                componentIn = text;
-
-                if (lastEditMessage != null) {
-                    int with = Mth.floor(this.getWidth() / this.getScale());
-                    List<FormattedCharSequence> list = ComponentRenderUtils.wrapComponents(lastEditMessage, with, this.minecraft.font);
-                    for (int i = 1; i <= list.size(); i++) {
-                        if (!this.trimmedMessages.isEmpty()) {
-                            this.trimmedMessages.removeFirst();
-                        }
-                        if (!this.allMessages.isEmpty()) {
-                            this.allMessages.removeFirst();
-                        }
-                    }
-                    if (CubesideClientFabric.getChatDatabase() != null) {
-                        try {
-                            CubesideClientFabric.getChatDatabase().deleteNewestMessage();
-                        } catch (Throwable e) {
-                            CubesideClientFabric.LOGGER.log(Level.WARN, "Could not delete latest message from Database " + e.getMessage());
-                        }
-                    }
-                }
-
-            } else {
-                lastMessage = componentIn;
-                count = 1;
-            }
+        Component originalMessage = componentIn;
+        if (!Configs.Chat.CountDuplicateMessages.getBooleanValue()) {
+            duplicateMessageTracker.reset();
         }
 
         if (Configs.PermissionSettings.AutoChat.getBooleanValue()) {
@@ -336,16 +322,50 @@ public abstract class MixinChatHud implements ChatHudMethods {
             timestamp.setStyle(Style.EMPTY.withColor(Configs.Chat.TimeStampColor.getColor().intValue));
             component.append(timestamp);
             component.append(componentIn);
-            addMessageToDatabase(component);
             componentIn = component;
-        } else {
-            addMessageToDatabase(componentIn);
         }
 
-        if (Configs.Chat.CountDuplicateMessages.getBooleanValue()) {
-            lastEditMessage = componentIn;
-        }
+        pendingOriginalMessage = originalMessage;
+        pendingVisibleMessage = null;
+        pendingDuplicateDecision = null;
         return componentIn;
+    }
+
+    @Inject(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At("HEAD"), cancellable = true)
+    private void queueMessageWhileLoading(Component message, MessageSignature signature, GuiMessageSource source, GuiMessageTag tag, CallbackInfo ci) {
+        if (CubesideClientFabric.isLoadingMessages()) {
+            CubesideClientFabric.messageQueue.add(message);
+            clearPendingMessage();
+            ci.cancel();
+        }
+    }
+
+    @Redirect(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;addMessageToDisplayQueue(Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V"))
+    private void addPreparedMessageToDisplay(ChatComponent instance, GuiMessage message) {
+        GuiMessage visibleMessage = pendingVisibleMessage != null ? pendingVisibleMessage : message;
+        cubesideMod$invokeAddMessageToDisplayQueue(visibleMessage);
+        if (pendingDuplicateDecision != null && pendingDuplicateDecision.removedLineCount() > 0) {
+            scrollChat(-pendingDuplicateDecision.removedLineCount());
+        }
+    }
+
+    @Redirect(method = "addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;addMessageToQueue(Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V"))
+    private void addPreparedMessageToQueue(ChatComponent instance, GuiMessage message) {
+        GuiMessage visibleMessage = pendingVisibleMessage != null ? pendingVisibleMessage : message;
+        cubesideMod$invokeAddMessageToQueue(visibleMessage);
+
+        DuplicateMessageTracker.Decision decision = pendingDuplicateDecision;
+        boolean persistenceSucceeded = persistVisibleMessage(visibleMessage, decision != null && decision.duplicate() && decision.previousPersisted());
+        if (pendingAggregationEnabled && decision != null) {
+            duplicateMessageTracker.commit(decision, visibleMessage, DuplicateMessageTracker.sequencePersisted(decision, persistenceSucceeded));
+        }
+        clearPendingMessage();
+    }
+
+    @Inject(method = "clearMessages(Z)V", at = @At("HEAD"))
+    private void resetDuplicateMessageState(boolean clearHistory, CallbackInfo ci) {
+        duplicateMessageTracker.reset();
+        clearPendingMessage();
     }
 
     @Inject(method = "addServerSystemMessage(Lnet/minecraft/network/chat/Component;)V", at = @At("HEAD"), cancellable = true)
@@ -376,12 +396,20 @@ public abstract class MixinChatHud implements ChatHudMethods {
 
     @Override
     public void cubesideMod$addStoredChatMessage(Component message) {
-        this.addMessageToDisplayQueue(new GuiMessage(0, message, null, GuiMessageSource.SYSTEM_SERVER, new GuiMessageTag(10631423, null, Component.literal("*"), null)));
+        GuiMessage storedMessage = new GuiMessage(0, message, null, GuiMessageSource.SYSTEM_SERVER, new GuiMessageTag(10631423, null, Component.literal("*"), null));
+        cubesideMod$invokeAddMessageToDisplayQueue(storedMessage);
+        cubesideMod$invokeAddMessageToQueue(storedMessage);
     }
 
     @Override
     public void cubesideMod$addStoredCommand(String message) {
         this.addRecentChat(message);
+    }
+
+    @Override
+    public void cubesideMod$resetDuplicateMessageState() {
+        duplicateMessageTracker.reset();
+        clearPendingMessage();
     }
 
     @Unique
@@ -394,20 +422,58 @@ public abstract class MixinChatHud implements ChatHudMethods {
     }
 
     @Unique
-    public void addMessageToDatabase(Component component) {
-        if (Configs.Chat.SaveMessagesToDatabase.getBooleanValue()) {
-            ChatDatabase chatDatabase = CubesideClientFabric.getChatDatabase();
-            if (chatDatabase != null) {
-                ClientLevel world = minecraft.level;
-                if (world != null) {
-                    try {
-                        RegistryOps<JsonElement> ops = world.registryAccess().createSerializationContext(JsonOps.INSTANCE);
-                        chatDatabase.addMessageEntry(ComponentSerialization.CODEC.encode(component, ops, ops.empty()).getOrThrow().toString());
-                    } catch (Throwable e) {
-                        CubesideClientFabric.LOGGER.log(Level.WARN, "Message can not save to Database " + e.getMessage());
-                    }
-                }
+    private GuiMessage withDuplicateCount(GuiMessage message, int duplicateCount) {
+        MutableComponent text = message.content().copy();
+        MutableComponent countText = Component.literal(formatDuplicateCount(duplicateCount));
+        countText.setStyle(Style.EMPTY.withColor(TextColor.fromRgb(Configs.Chat.CountDuplicateMessagesColor.getColor().toVanillaRgb())));
+        text.append(countText);
+        return new GuiMessage(message.addedTime(), text, message.signature(), message.source(), message.tag());
+    }
+
+    @Unique
+    private static String formatDuplicateCount(int duplicateCount) {
+        DuplicateMessageFormatter.Result result = DuplicateMessageFormatter.format(Configs.Chat.CountDuplicateMessagesFormat.getStringValue(), duplicateCount);
+        if (result.usedFallback()) {
+            if (!invalidDuplicateFormatWarningLogged) {
+                invalidDuplicateFormatWarningLogged = true;
+                CubesideClientFabric.LOGGER.log(Level.WARN, "Invalid duplicate message count format; using default", result.error());
             }
         }
+        return result.text();
+    }
+
+    @Unique
+    private boolean persistVisibleMessage(GuiMessage message, boolean replaceNewest) {
+        if (!Configs.Chat.SaveMessagesToDatabase.getBooleanValue()) {
+            return false;
+        }
+
+        ChatDatabase chatDatabase = CubesideClientFabric.getChatDatabase();
+        ClientLevel world = minecraft.level;
+        if (chatDatabase == null || world == null) {
+            return false;
+        }
+
+        try {
+            RegistryOps<JsonElement> ops = world.registryAccess().createSerializationContext(JsonOps.INSTANCE);
+            String serializedMessage = ComponentSerialization.CODEC.encode(message.content(), ops, ops.empty()).getOrThrow().toString();
+            if (replaceNewest) {
+                chatDatabase.replaceNewestMessage(serializedMessage);
+            } else {
+                chatDatabase.addMessageEntry(serializedMessage);
+            }
+            return true;
+        } catch (Throwable e) {
+            CubesideClientFabric.LOGGER.log(Level.WARN, "Message can not save to Database " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Unique
+    private void clearPendingMessage() {
+        pendingOriginalMessage = null;
+        pendingVisibleMessage = null;
+        pendingDuplicateDecision = null;
+        pendingAggregationEnabled = false;
     }
 }

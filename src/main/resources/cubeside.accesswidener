@@ -1,5 +1,7 @@
 accessWidener v1 official
 accessible class net/minecraft/client/OptionInstance$ValueSet
 extendable class net/minecraft/client/OptionInstance$SliderableValueSet
+accessible class net/minecraft/client/gui/components/AbstractSelectionList$Entry
+
 accessible    field    net/minecraft/world/item/ShovelItem    FLATTENABLES    Ljava/util/Map;
 accessible    field    net/minecraft/world/item/AxeItem    STRIPPABLES    Ljava/util/Map;

@@ -7,4 +7,6 @@ public interface ChatHudMethods {
     void cubesideMod$addStoredChatMessage(Component message);
 
     void cubesideMod$addStoredCommand(String command);
+
+    void cubesideMod$resetDuplicateMessageState();
 }

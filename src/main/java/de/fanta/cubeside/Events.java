@@ -53,6 +53,7 @@ public class Events {
 
     public void init() {
         ClientPlayConnectionEvents.INIT.register((handler, client) -> {
+            ((ChatHudMethods) client.gui.hud.getChat()).cubesideMod$resetDuplicateMessageState();
             if (Configs.Chat.SaveMessagesToDatabase.getBooleanValue() && !CubesideClientFabric.databaseinuse) {
                 if (!connect) {
                     String worldName;

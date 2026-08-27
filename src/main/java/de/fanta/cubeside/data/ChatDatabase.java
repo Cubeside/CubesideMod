@@ -33,21 +33,23 @@ public class ChatDatabase {
     private File dbFile;
     private ArrayList<ChatMessage> chatMessages;
     private ArrayList<ChatMessage> commands;
-    private boolean markNextMessageDeleted;
-
     private DataOutputStream dataOut;
 
     public ChatDatabase(String server, RegistryAccess registry) {
+        this(server, registry, new File(CubesideClientFabric.getConfigDirectory(), "/chatStorage/" + server.toLowerCase() + ".dat"));
+    }
+
+    ChatDatabase(String server, RegistryAccess registry, File dbFile) {
         long time = System.nanoTime();
         this.server = server;
         this.registry = registry;
+        this.dbFile = dbFile;
 
         chatMessages = new ArrayList<>();
         commands = new ArrayList<>();
 
         long minTime = System.currentTimeMillis() - Configs.Chat.DaysTheMessagesAreStored.getIntegerValue() * 24L * 60 * 60 * 1000L;
 
-        dbFile = new File(CubesideClientFabric.getConfigDirectory(), "/chatStorage/" + server.toLowerCase() + ".dat");
         if (dbFile.isFile()) {
             try (DataInputStream dataIn = new DataInputStream(new BufferedInputStream(new FileInputStream(dbFile)))) {
                 while (true) {
@@ -80,17 +82,12 @@ public class ChatDatabase {
         long delta = System.nanoTime() - time;
         CubesideClientFabric.LOGGER.info("Loaded " + chatMessages.size() + " + " + commands.size() + " chatmessages for " + server + " in " + (delta / 1000) + " micros");
 
-        File oldDbFile = new File(CubesideClientFabric.getConfigDirectory(), "/chatStorage/" + server.toLowerCase() + "_1_" + ".db");
-        if (oldDbFile.isFile()) {
-            oldDbFile.delete();
-        }
-
         time = System.nanoTime();
         if (dbFile != null) {
             try {
                 dataOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dbFile)));
                 for (ChatMessage message : chatMessages) {
-                    writeChatMessage(message.text(), message.date(), false);
+                    writeChatMessage(message.text(), message.date(), false, false);
                 }
                 for (ChatMessage message : commands) {
                     writeCommand(message.text(), message.date(), false);
@@ -108,14 +105,24 @@ public class ChatDatabase {
     public void addMessageEntry(String message) {
         long now = System.currentTimeMillis();
         chatMessages.addLast(new ChatMessage(message, now));
-        writeChatMessage(message, now, true);
+        writeChatMessage(message, now, false, true);
     }
 
-    private void writeChatMessage(String message, long now, boolean flush) {
+    public void replaceNewestMessage(String message) {
+        long now = System.currentTimeMillis();
+        boolean replacesNewest = !chatMessages.isEmpty();
+        if (replacesNewest) {
+            chatMessages.removeLast();
+        }
+        chatMessages.addLast(new ChatMessage(message, now));
+        writeChatMessage(message, now, replacesNewest, true);
+    }
+
+    private void writeChatMessage(String message, long now, boolean replacesNewest, boolean flush) {
         if (dbFile != null) {
             try {
                 dataOut.writeByte(0); // chat message
-                dataOut.writeBoolean(markNextMessageDeleted);
+                dataOut.writeBoolean(replacesNewest);
                 try {
                     dataOut.writeUTF(message);
                 } catch (UTFDataFormatException e) {
@@ -128,7 +135,6 @@ public class ChatDatabase {
             } catch (IOException e) {
                 CubesideClientFabric.LOGGER.log(Level.ERROR, "Could not serialize chat message", e);
             }
-            markNextMessageDeleted = false;
         }
     }
 
@@ -204,13 +210,6 @@ public class ChatDatabase {
         long delta = System.nanoTime() - time;
         CubesideClientFabric.LOGGER.info(entries.size() + " commands were loaded in " + (delta / 1000) + " micros");
         return entries;
-    }
-
-    public void deleteNewestMessage() {
-        markNextMessageDeleted = true;
-        if (!chatMessages.isEmpty()) {
-            chatMessages.removeLast();
-        }
     }
 
     public String getServer() {
