@@ -9,28 +9,26 @@ import de.fanta.cubeside.config.option.ConfigInteger;
 import de.fanta.cubeside.config.option.ConfigString;
 import de.fanta.cubeside.config.option.ConfigStringList;
 import de.fanta.cubeside.config.option.ConfigValue;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.MutableComponent;
 import org.lwjgl.glfw.GLFW;
 
-public final class SettingsListWidget extends AbstractSelectionList<SettingsListWidget.Entry> {
+public final class SettingsListWidget extends ContainerObjectSelectionList<SettingsListWidget.Entry> {
     private static final int OPTION_HEIGHT = 28;
     private static final int HEADER_HEIGHT = 24;
     private final ConfigGui screen;
@@ -63,10 +61,6 @@ public final class SettingsListWidget extends AbstractSelectionList<SettingsList
         return false;
     }
 
-    @Override
-    protected void updateWidgetNarration(NarrationElementOutput output) {
-    }
-
     public void commitPendingText() {
         for (Entry entry : children()) {
             if (entry instanceof OptionEntry optionEntry && optionEntry.control instanceof CommitEditBox editBox) {
@@ -75,7 +69,7 @@ public final class SettingsListWidget extends AbstractSelectionList<SettingsList
         }
     }
 
-    public abstract static class Entry extends AbstractSelectionList.Entry<Entry> {
+    public abstract static class Entry extends ContainerObjectSelectionList.Entry<Entry> {
     }
 
     private final class GroupEntry extends Entry {
@@ -83,6 +77,16 @@ public final class SettingsListWidget extends AbstractSelectionList<SettingsList
 
         private GroupEntry(Component title) {
             this.title = title;
+        }
+
+        @Override
+        public List<AbstractWidget> children() {
+            return List.of();
+        }
+
+        @Override
+        public List<AbstractWidget> narratables() {
+            return List.of();
         }
 
         @Override
@@ -99,6 +103,16 @@ public final class SettingsListWidget extends AbstractSelectionList<SettingsList
         private OptionEntry(ConfigValue<?> option) {
             this.option = option;
             this.control = createControl(option);
+        }
+
+        @Override
+        public List<AbstractWidget> children() {
+            return List.of(control);
+        }
+
+        @Override
+        public List<AbstractWidget> narratables() {
+            return List.of(control);
         }
 
         private AbstractWidget createControl(ConfigValue<?> value) {
@@ -151,30 +165,6 @@ public final class SettingsListWidget extends AbstractSelectionList<SettingsList
             consumer.accept(control);
         }
 
-        @Override
-        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-            return control.mouseClicked(event, doubleClick);
-        }
-
-        @Override
-        public boolean mouseReleased(MouseButtonEvent event) {
-            return control.mouseReleased(event);
-        }
-
-        @Override
-        public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-            return control.mouseDragged(event, dx, dy);
-        }
-
-        @Override
-        public boolean keyPressed(KeyEvent event) {
-            return control.keyPressed(event);
-        }
-
-        @Override
-        public boolean charTyped(CharacterEvent event) {
-            return control.charTyped(event);
-        }
     }
 
     private static Component formatOption(ConfigValue<?> option) {
