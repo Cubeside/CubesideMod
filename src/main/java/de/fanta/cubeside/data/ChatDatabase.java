@@ -75,27 +75,26 @@ public class ChatDatabase {
                 }
             } catch (EOFException ignored) {
             } catch (IOException e) {
-                CubesideClientFabric.LOGGER.log(Level.ERROR, "Could not load chat messages", e);
-                dbFile = null;
+                CubesideClientFabric.LOGGER.log(Level.ERROR, "Could not load chat messages. Renaming old file", e);
+                dbFile.renameTo(new File(dbFile.getParent(), server.toLowerCase() + ".backup." + System.currentTimeMillis() + ".dat"));
             }
         }
         long delta = System.nanoTime() - time;
         CubesideClientFabric.LOGGER.info("Loaded " + chatMessages.size() + " + " + commands.size() + " chatmessages for " + server + " in " + (delta / 1000) + " micros");
 
         time = System.nanoTime();
-        if (dbFile != null) {
-            try {
-                dataOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dbFile)));
-                for (ChatMessage message : chatMessages) {
-                    writeChatMessage(message.text(), message.date(), false, false);
-                }
-                for (ChatMessage message : commands) {
-                    writeCommand(message.text(), message.date(), false);
-                }
-                dataOut.flush();
-            } catch (IOException e) {
-                CubesideClientFabric.LOGGER.log(Level.ERROR, "Could not open chat messages file for writing", e);
+        try {
+            dataOut = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dbFile)));
+            for (ChatMessage message : chatMessages) {
+                writeChatMessage(message.text(), message.date(), false, false);
             }
+            for (ChatMessage message : commands) {
+                writeCommand(message.text(), message.date(), false);
+            }
+            dataOut.flush();
+        } catch (IOException e) {
+            CubesideClientFabric.LOGGER.log(Level.ERROR, "Could not open chat messages file for writing", e);
+            dbFile = null;
         }
         delta = System.nanoTime() - time;
         CubesideClientFabric.LOGGER.info("Saved " + chatMessages.size() + " + " + commands.size() + " chatmessages for " + server + " in " + (delta / 1000) + " micros");
