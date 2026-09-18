@@ -1,1 +1,3 @@
-- Update 1.21.3
+- Update to Minecraft 26.3
+- Update Fabric, Sodium, Mod Menu, and CubesideUtilsFabricClient dependencies
+- Adapt input handling and block interaction settings to Minecraft 26.3

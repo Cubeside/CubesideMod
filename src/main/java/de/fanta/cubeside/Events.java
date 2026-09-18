@@ -24,13 +24,18 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.BlockTransformer;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.item.component.BlockTransformers;
 import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.LevelResource;
@@ -227,11 +232,11 @@ public class Events {
             BlockPos blockPos = hitResult.getBlockPos();
             BlockState blockState = world.getBlockState(blockPos);
 
-            if (!Configs.Generic.WoodStriping.getBooleanValue() && itemInHand.getItem() instanceof AxeItem && AxeItem.STRIPPABLES.containsKey(blockState.getBlock())) {
+            if (!Configs.Generic.WoodStriping.getBooleanValue() && canTransformBlock(itemInHand, BlockTransformers.AXE, SoundEvents.AXE_STRIP, world, blockPos, hitResult.getDirection())) {
                 return InteractionResult.FAIL;
             }
 
-            if (!Configs.Generic.CreateGrassPath.getBooleanValue() && itemInHand.getItem() instanceof ShovelItem && ShovelItem.FLATTENABLES.containsKey(blockState.getBlock())) {
+            if (!Configs.Generic.CreateGrassPath.getBooleanValue() && canTransformBlock(itemInHand, BlockTransformers.SHOVEL, SoundEvents.SHOVEL_FLATTEN, world, blockPos, hitResult.getDirection())) {
                 return InteractionResult.FAIL;
             }
 
@@ -241,6 +246,16 @@ public class Events {
 
             return InteractionResult.PASS;
         });
+    }
+
+    private static boolean canTransformBlock(ItemStack item, ResourceKey<BlockTransformer> key, Holder<SoundEvent> sound, net.minecraft.world.level.Level world, BlockPos pos, Direction face) {
+        Holder<BlockTransformer> transformer = item.get(DataComponents.BLOCK_TRANSFORMER);
+        if (transformer == null || !transformer.is(key)) {
+            return false;
+        }
+        return transformer.value().transforms().stream()
+                .filter(transform -> transform.sound().equals(sound) && !transform.disallowedFaces().contains(face))
+                .anyMatch(transform -> transform.blockStateProvider().value().getOptionalState(world, world.getRandom(), pos) != null);
     }
 
     public String getMapName(Minecraft client) {

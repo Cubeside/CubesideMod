@@ -26,7 +26,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.MutableComponent;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 public final class SettingsListWidget extends ContainerObjectSelectionList<SettingsListWidget.Entry> {
     private static final int OPTION_HEIGHT = 28;
@@ -315,7 +315,7 @@ public final class SettingsListWidget extends ContainerObjectSelectionList<Setti
 
         @Override
         public boolean keyPressed(KeyEvent event) {
-            if (event.key() == GLFW.GLFW_KEY_ENTER || event.key() == GLFW.GLFW_KEY_KP_ENTER) {
+            if (event.key() == InputConstants.KEY_RETURN || event.key() == InputConstants.KEY_NUMPADENTER) {
                 commit();
                 if (!dirty) {
                     setFocused(false);

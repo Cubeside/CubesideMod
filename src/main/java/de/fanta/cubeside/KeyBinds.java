@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
 
 public class KeyBinds {
     public static KeyMapping.Category CATEGORY_CUBESIDE;
@@ -23,50 +22,50 @@ public class KeyBinds {
 
         NARRATOR_KEYBINDING = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "options.narrator",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_B,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.KEY_B,
                 KeyMapping.Category.MISC));
 
         AUTO_CHAT = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.cubeside.autochat",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_UNKNOWN,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.UNKNOWN.getValue(),
                 CATEGORY_CUBESIDE));
 
         TOGGLE_SHOW_ENTITIES_IN_SPECTATOR_MODE = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.cubeside.showentitiesinspectator",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_K,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.KEY_K,
                 CATEGORY_CUBESIDE));
 
         TOGGLE_MINING_ASSISTANT = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.cubeside.miningassistant",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_UNKNOWN,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.UNKNOWN.getValue(),
                 CATEGORY_CUBESIDE));
 
         SET_MINING_ASSISTANT_START_POINT = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.cubeside.setminingassistantstartpoint",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_UNKNOWN,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.UNKNOWN.getValue(),
                 CATEGORY_CUBESIDE));
 
         WOOD_STRIPING = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.cubeside.woodstriping",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_UNKNOWN,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.UNKNOWN.getValue(),
                 CATEGORY_CUBESIDE));
 
         CREATE_GRASS_PATH = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.cubeside.creategrasspath",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_UNKNOWN,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.UNKNOWN.getValue(),
                 CATEGORY_CUBESIDE));
 
         EDIT_SIGN = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.cubeside.editsign",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_UNKNOWN,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.UNKNOWN.getValue(),
                 CATEGORY_CUBESIDE));
     }
 

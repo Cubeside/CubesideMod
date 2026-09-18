@@ -14,7 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.joml.Quaternionf;
+import org.joml.Matrix4f;
 
 public class MiningAssistent {
 
@@ -143,7 +143,7 @@ public class MiningAssistent {
         double cameraZ = camera.position().z;
         matrixStack.pushPose();
         matrixStack.translate(pos.getX() + 0.5 - cameraX, pos.getY() - cameraY + 0.005, pos.getZ() + 0.5 - cameraZ);
-        matrixStack.mulPose(new Quaternionf().fromAxisAngleDeg(1, 0, 0, 90)); // 90
+        matrixStack.mulPose(new Matrix4f().rotateX((float) (Math.PI / 2)));
         float size = 0.07F;
         matrixStack.scale(-size, -size, size);
         float float_3 = (-font.width(text)) / 2.0F + 0.4f;

@@ -23,7 +23,7 @@ public class MixinItemStack {
     @Shadow
     PatchedDataComponentMap components;
 
-    @Inject(method = "addToTooltip", at = @At(value = "RETURN"))
+    @Inject(method = "addToTooltip(Lnet/minecraft/core/component/DataComponentType;Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/item/component/TooltipDisplay;Ljava/util/function/Consumer;Lnet/minecraft/world/item/TooltipFlag;)V", at = @At(value = "RETURN"))
     private <T extends TooltipProvider> void appendComponentTooltip(DataComponentType<T> componentType, Item.TooltipContext context, TooltipDisplay displayComponent, Consumer<Component> textConsumer, TooltipFlag type, CallbackInfo ci) {
         if (componentType == DataComponents.ENCHANTMENTS && Configs.Generic.ShowAdditionalRepairCosts.getBooleanValue() && displayComponent.shows(componentType)) {
             Integer repairCost = components.get(DataComponents.REPAIR_COST);

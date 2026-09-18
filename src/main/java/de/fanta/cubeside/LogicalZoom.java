@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.glfw.GLFW;
 
 public class LogicalZoom {
     // Code from LogicalGeekBoy -> https://github.com/LogicalGeekBoy/logical_zoom
@@ -16,7 +15,7 @@ public class LogicalZoom {
     public static final float zoomLevel = 0.23F;
 
     public void initLogicalZoom() {
-        keyBinding = new KeyMapping("key.logical_zoom.zoom", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, KeyBinds.CATEGORY_CUBESIDE);
+        keyBinding = new KeyMapping("key.logical_zoom.zoom", InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), KeyBinds.CATEGORY_CUBESIDE);
 
         currentlyZoomed = false;
         originalSmoothCameraEnabled = false;

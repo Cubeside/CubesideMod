@@ -19,7 +19,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 public final class ColorPickerDialog extends AbstractContainerWidget {
     private static final int PANEL_PADDING = 12;
@@ -297,7 +297,7 @@ public final class ColorPickerDialog extends AbstractContainerWidget {
 
         @Override
         public boolean keyPressed(KeyEvent event) {
-            if (event.key() == GLFW.GLFW_KEY_ENTER || event.key() == GLFW.GLFW_KEY_KP_ENTER) {
+            if (event.key() == InputConstants.KEY_RETURN || event.key() == InputConstants.KEY_NUMPADENTER) {
                 normalizeHex();
                 if (hexValid) {
                     setFocused(false);

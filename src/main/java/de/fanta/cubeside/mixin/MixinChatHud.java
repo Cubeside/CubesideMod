@@ -117,7 +117,7 @@ public abstract class MixinChatHud implements ChatHudMethods {
     @Shadow
     public abstract void scrollChat(int amount);
 
-    @Inject(method = "extractRenderState", at = @At(value = "RETURN"))
+    @Inject(method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V", at = @At(value = "RETURN"))
     private void renderChatHudInfo(GuiGraphicsExtractor context, Font font, int currentTick, int mouseX, int mouseY, ChatComponent.DisplayMode displayMode, boolean changeCursorOnInsertions, CallbackInfo ci) {
         if (displayMode.foreground) {
             chatInfoHud = chatInfoHud != null ? chatInfoHud : new ChatInfoHud();

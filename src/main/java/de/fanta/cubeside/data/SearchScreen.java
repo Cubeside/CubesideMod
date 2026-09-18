@@ -16,7 +16,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 public class SearchScreen extends Screen {
     private final Screen parent;
@@ -143,7 +143,7 @@ public class SearchScreen extends Screen {
     @Override
     public boolean keyPressed(KeyEvent input) {
         int keyCode = input.input();
-        if ((keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER) && this.searchField.isFocused()) {
+        if ((keyCode == InputConstants.KEY_RETURN || keyCode == InputConstants.KEY_NUMPADENTER) && this.searchField.isFocused()) {
             filterEntries(this.searchField.getValue());
         }
         return super.keyPressed(input);

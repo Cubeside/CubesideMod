@@ -1,16 +1,16 @@
 package de.fanta.cubeside.mixin;
 
 import de.fanta.cubeside.KeyBinds;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.input.KeyEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(KeyboardHandler.class)
 public class MixinKeyboard {
-    @ModifyConstant(method = "keyPress", constant = @Constant(intValue = 66))
-    private int narratorkey(int old) {
-        return KeyMappingHelper.getBoundKeyOf(KeyBinds.NARRATOR_KEYBINDING).getValue();
+    @Redirect(method = "keyPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/KeyEvent;shortcutKey()I", ordinal = 1))
+    private int narratorShortcutKey(KeyEvent event) {
+        return KeyBinds.NARRATOR_KEYBINDING.matches(event) ? 'b' : -1;
     }
 }
