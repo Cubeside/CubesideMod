@@ -225,7 +225,8 @@ public class Events {
             CubesideClientFabric.commands.register(dispatcher);
         });
 
-        LevelRenderEvents.BEFORE_TRANSLUCENT_TERRAIN.register(context -> MiningAssistent.render(context.poseStack(), context.submitNodeCollector()));
+        // Font measurements can upload glyphs, so collect text before GPU render passes begin.
+        LevelRenderEvents.COLLECT_SUBMITS.register(context -> MiningAssistent.render(context.poseStack(), context.submitNodeCollector()));
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
             ItemStack itemInHand = player.getItemInHand(hand);
