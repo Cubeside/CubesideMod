@@ -20,8 +20,6 @@ public class MixinPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
         CONDITIONS.put("de.fanta.cubeside.mixin.DurabilityViewerMixin", () -> FabricLoader.getInstance().isModLoaded("durabilityviewer"));
-        CONDITIONS.put("de.fanta.cubeside.mixin.MixinSliderControl", () -> FabricLoader.getInstance().isModLoaded("sodium"));
-        CONDITIONS.put("de.fanta.cubeside.mixin.MixinOptionImpl", () -> FabricLoader.getInstance().isModLoaded("sodium"));
         CONDITIONS.put("de.fanta.cubeside.mixin.MixinChatLimit", () -> !containsFeather());
         CONDITIONS.put("de.fanta.cubeside.mixin.MixinKeyboard", () -> !FabricLoader.getInstance().isModLoaded("rebind_all_the_keys"));
     }

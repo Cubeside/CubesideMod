@@ -26,5 +26,8 @@
     "fabric-api": ">=0.160.6",
     "minecraft": ">=26.3",
     "cubesideutilsfabricclient": ">=1.1.2"
+  },
+  "breaks": {
+    "sodium": "<0.9.3-beta.1"
   }
 }
